@@ -28,23 +28,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// use Ledyer\Ledyer_Order_Management_For_WooCommerce;
+use LedyerOm\Ledyer_Order_Management_For_WooCommerce;
 
 \defined( 'ABSPATH' ) || die();
 
-// require_once __DIR__ . '/classes/class-ledyer-om-singleton.php';
-// require_once __DIR__ . '/classes/class-ledyer-om-main.php';
+require_once __DIR__ . '/classes/class-ledyer-om-singleton.php';
+require_once __DIR__ . '/classes/class-ledyer-om-main.php';
 
 /**
  * Required minimums and constants
  */
 // \define( 'LOM_WC_VERSION', Ledyer_Order_Management_For_WooCommerce::VERSION );
-// \define( 'LOM_WC_MIN_PHP_VER', '5.6.0' );
-// \define( 'LOM_WC_MIN_WC_VER', '3.9.0' );
-// \define( 'LOM_WC_MAIN_FILE', __FILE__ );
-// \define( 'LOM_WC_PLUGIN_NAME', dirname( plugin_basename( LOM_WC_MAIN_FILE ) ) );
-// \define( 'LOM_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-// \define( 'LOM_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+\define( 'LOM_WC_MIN_PHP_VER', '5.6.0' );
+\define( 'LOM_WC_MIN_WC_VER', '3.9.0' );
+\define( 'LOM_WC_MAIN_FILE', __FILE__ );
+\define( 'LOM_WC_PLUGIN_NAME', dirname( plugin_basename( LOM_WC_MAIN_FILE ) ) );
+\define( 'LOM_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+\define( 'LOM_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 
 function ledyerOm() {
   echo 'HELLO LEDYER OM';
