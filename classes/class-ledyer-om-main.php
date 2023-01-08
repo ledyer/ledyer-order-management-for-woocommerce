@@ -82,8 +82,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 		$this->parentSettings   = ParentSettings::instance();
 		$this->api           = new API();
 
-		$environment = ledyerOm()->parentSettings->get_test_environment();
-
 		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array(
 			$this,
 			'plugin_action_links'
