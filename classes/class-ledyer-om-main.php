@@ -88,7 +88,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		));
 
 		// Dummy request just as a POC of working api-calls
-		$order = $this->api->get_order('or_2K2Q5CvCg84Y6o10uT90tz0g7Mh');
+		$order = $this->api->get_order('or_2Jzwiy0aAXIvxRkFQQbQ11stizb');
 		$asdf = 'asdf';
 	}
 

@@ -24,7 +24,7 @@ class Get_Order extends Request_Order {
 	 * Set entrypoint
 	 */
 	protected function set_url() {
-		$this->url = sprintf( 'v1/merchant/orders/%s', $this->arguments['orderId'] );
+		$this->url = sprintf( 'v1/orders/%s', $this->arguments['orderId'] );
 
 		parent::get_request_url();
 	}
