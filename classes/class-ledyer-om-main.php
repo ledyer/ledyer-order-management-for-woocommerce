@@ -32,15 +32,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 
 		// TODO? Add hook to listen to notifications. Look in Ledyer checkout plugin for this snippet
 
-		add_action(
-			'woocommerce_checkout_fields',
-			array(
-				$this,
-				'modify_checkout_fields',
-			),
-			20,
-			1,
-		);
 
 	}
 
