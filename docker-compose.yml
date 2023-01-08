@@ -41,11 +41,19 @@ services:
       - "./:/var/www/html/wp-content/plugins/ledyer-order-management-for-woocommerce"
       - wpdata:/var/www/html
 
+  wordpress-cron:
+    depends_on:
+      - wordpress-dev
+    build:
+      context: .
+      dockerfile: Dockerfile-cron
+    restart: on-failure
+
   wordpress-cli:
     depends_on:
       - db
       - wordpress-dev
-    image: wordpress:cli-2.7.1
+    image: wordpress:cli
     restart: on-failure
     environment:
       WORDPRESS_DB_HOST: db

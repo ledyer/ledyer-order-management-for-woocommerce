@@ -38,7 +38,7 @@ require_once __DIR__ . '/classes/class-ledyer-om-main.php';
 /**
  * Required minimums and constants
  */
-// \define( 'LOM_WC_VERSION', Ledyer_Order_Management_For_WooCommerce::VERSION );
+\define( 'LOM_WC_VERSION', Ledyer_Order_Management_For_WooCommerce::VERSION );
 \define( 'LOM_WC_MIN_PHP_VER', '5.6.0' );
 \define( 'LOM_WC_MIN_WC_VER', '3.9.0' );
 \define( 'LOM_WC_MAIN_FILE', __FILE__ );
@@ -47,8 +47,7 @@ require_once __DIR__ . '/classes/class-ledyer-om-main.php';
 \define( 'LOM_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 
 function ledyerOm() {
-  echo 'HELLO LEDYER OM';
-	// return Ledyer_Order_Management_For_WooCommerce::instance();
+	return Ledyer_Order_Management_For_WooCommerce::instance();
 }
 
 ledyerOm();
