@@ -8,7 +8,6 @@ namespace LedyerOm;
 
 \defined( 'ABSPATH' ) || die();
 
-// use LedyerOm\Requests\Order\Get_Order;
 use LedyerOm\Requests\Order\Get_Order;
 
 /**

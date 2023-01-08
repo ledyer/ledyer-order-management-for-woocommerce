@@ -27,12 +27,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	 * @return void
 	 */
 	public function actions() {
-		\add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
-		\add_action( 'admin_init', array( $this, 'on_admin_init' ) );
-
-		// TODO? Add hook to listen to notifications. Look in Ledyer checkout plugin for this snippet
-
-
+		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
 	}
 
 	/**
@@ -69,25 +64,15 @@ class Ledyer_Order_Management_For_WooCommerce {
 		$this->include_files();
 		$this->set_settings();
 
-		$this->credentials   = Credentials::instance();
+		$this->credentials      = Credentials::instance();
 		$this->parentSettings   = ParentSettings::instance();
-		$this->api           = new API();
+		$this->api              = new API();
 
-		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array(
-			$this,
-			'plugin_action_links'
-		));
+		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array($this, 'plugin_action_links'));
 
 		// Dummy request just as a POC of working api-calls
 		$order = $this->api->get_order('or_2Jzwiy0aAXIvxRkFQQbQ11stizb');
 		$asdf = 'asdf';
-	}
-
-	/**
-	 * Init meta box on admin hook.
-	 */
-	public function on_admin_init() {
-		// new Meta_Box();
 	}
 
 	public function include_files() {
