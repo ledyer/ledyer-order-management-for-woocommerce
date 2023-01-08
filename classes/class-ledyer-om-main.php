@@ -8,15 +8,9 @@
 
 namespace LedyerOm;
 
-// use Ledyer\Admin\Meta_Box;
 
 \defined( 'ABSPATH' ) || die();
 
-/**
- * Ledyer_Order_Management_For_WooCommerce class.
- *
- * Init class
- */
 class Ledyer_Order_Management_For_WooCommerce {
 	use Singleton;
 
