@@ -53,7 +53,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	}
 
 	/**
-	 * Return the proper link for the settings page of KOM.
+	 * Return the proper link for the settings page of LOM.
 	 *
 	 * @return string The full settings page URL.
 	 */
