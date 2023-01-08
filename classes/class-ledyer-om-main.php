@@ -36,7 +36,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	}
 
 	/**
-	 * Adds plugin action link to Krokedil documentation for KOM.
+	 * Adds plugin action link to Ledyer documentation for LOM.
 	 *
    * @param array $links Plugin action link before filtering.
 	 *
