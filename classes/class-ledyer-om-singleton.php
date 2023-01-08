@@ -50,7 +50,6 @@ trait Singleton {
 	 * @return void
 	 */
 	public function actions() {
-    echo "actions echo!";
 	}
 
 	/**

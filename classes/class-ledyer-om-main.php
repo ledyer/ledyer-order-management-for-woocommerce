@@ -14,6 +14,10 @@ namespace LedyerOm;
 class Ledyer_Order_Management_For_WooCommerce {
 	use Singleton;
 
+	public $credentials;
+	public $parentSettings;
+	public $api;
+
 	const VERSION = '1.0.0';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
@@ -26,13 +30,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		\add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
 		\add_action( 'admin_init', array( $this, 'on_admin_init' ) );
 
-		// add_action( 'rest_api_init', function () {
-		// 	register_rest_route( 'ledyer/v1', '/notifications/', array(
-		// 		'methods'             => 'POST',
-		// 		'callback'            => [ $this, 'handle_notification' ],
-		// 		'permission_callback' => '__return_true'
-		// 	) );
-		// } );
+		// TODO? Add hook to listen to notifications. Look in Ledyer checkout plugin for this snippet
 
 		add_action(
 			'woocommerce_checkout_fields',
@@ -44,7 +42,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 			1,
 		);
 
-		// add_action( 'schedule_process_notification', array( $this, 'process_notification' ), 10, 1 );
 	}
 
 	/**
@@ -81,19 +78,20 @@ class Ledyer_Order_Management_For_WooCommerce {
 		$this->include_files();
 		$this->set_settings();
 
-		// AJAX::init();
-		// Confirmation::instance();
-		// Set class variables.
-		// $this->credentials   = Credentials::instance();
-		// $this->merchant_urls = new Merchant_URLs();
-		// $this->api           = new API();
+		$this->credentials   = Credentials::instance();
+		$this->parentSettings   = ParentSettings::instance();
+		$this->api           = new API();
 
-		// load_plugin_textdomain( 'ledyer-checkout-for-woocommerce', false, LOM_WC_PLUGIN_NAME . '/languages' );
+		$environment = ledyerOm()->parentSettings->get_test_environment();
 
 		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array(
 			$this,
 			'plugin_action_links'
 		));
+
+		// Dummy request just as a POC of working api-calls
+		$order = $this->api->get_order('or_2K2Q5CvCg84Y6o10uT90tz0g7Mh');
+		$asdf = 'asdf';
 	}
 
 	/**
@@ -106,5 +104,13 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public function include_files() {
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-functions.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-credentials.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
+		
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-api.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/class-ledyer-om-request.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-get-order.php';
 	}
 }
