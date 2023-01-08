@@ -109,34 +109,6 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 			'lom-settings',
 			'lom_settings_section'
 		);
-		add_settings_field(
-			'lom_auto_update',
-			'On order update',
-			array( $this, 'field_auto_update_render' ),
-			'lom-settings',
-			'lom_settings_section'
-		);
-		add_settings_field(
-			'lom_auto_order_sync',
-			'On order creation ( manual )',
-			array( $this, 'field_order_sync_render' ),
-			'lom-settings',
-			'lom_settings_section'
-		);
-		add_settings_field(
-			'lom_force_full_capture',
-			'Force capture full order',
-			array( $this, 'field_force_full_capture_render' ),
-			'lom-settings',
-			'lom_settings_section'
-		);
-		add_settings_field(
-			'lom_debug_log',
-			'Debug log',
-			array( $this, 'field_debug_log_render' ),
-			'lom-settings',
-			'lom_settings_section'
-		);
 	}
 
 	/**
@@ -182,74 +154,7 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		<?php
 	}
 
-	/**
-	 * HTML For the input field.
-	 *
-	 * @return void
-	 */
-	public function field_auto_update_render() {
-		$options = get_option( 'lom_settings' );
-		$val     = ( isset( $options['lom_auto_update'] ) ) ? $options['lom_auto_update'] : 'yes';
-		?>
-		<input type="hidden" name="lom_settings[lom_auto_update]" value="no" />
-		<label for="lom_settings[lom_auto_update]" >
-		<input type='checkbox' name='lom_settings[lom_auto_update]' value='yes' <?php checked( $val, 'yes' ); ?>>
-		<?php esc_html_e( 'Update Ledyer order automatically when WooCommerce order is updated.', 'ledyer-order-management-for-woocommerce' ); ?>
-		</label>
-		<?php
-	}
-
-	/**
-	 * HTML For the input field.
-	 *
-	 * @return void
-	 */
-	public function field_order_sync_render() {
-		$options = get_option( 'lom_settings' );
-		$val     = ( isset( $options['lom_auto_order_sync'] ) ) ? $options['lom_auto_order_sync'] : 'yes';
-		?>
-		<input type="hidden" name="lom_settings[lom_auto_order_sync]" value="no" />
-		<label for="lom_settings[lom_auto_order_sync]">
-		<input type='checkbox' name='lom_settings[lom_auto_order_sync]' value='yes' <?php checked( $val, 'yes' ); ?>>
-		<?php esc_html_e( 'Gets the customer information from Ledyer when creating a manual admin order and adding a Ledyer order id as a transaction id.', 'ledyer-order-management-for-woocommerce' ); ?>
-		</label>
-		<?php
-	}
-
-	/**
-	 * HTML For the input field.
-	 *
-	 * @return void
-	 */
-	public function field_debug_log_render() {
-		$options = get_option( 'lom_settings' );
-		$val     = ( isset( $options['lom_debug_log'] ) ) ? $options['lom_debug_log'] : 'yes';
-		?>
-		<input type="hidden" name="lom_settings[lom_debug_log]" value="no" />
-		<label for="lom_settings[lom_debug_log]">
-		<input type='checkbox' name='lom_settings[lom_debug_log]' value='yes' <?php checked( $val, 'yes' ); ?>>
-		<?php esc_html_e( 'Enable the debug log.', 'ledyer-order-management-for-woocommerce' ); ?>
-		</label>
-		<?php
-	}
-
-	/**
-	 * HTML For the input field.
-	 *
-	 * @return void
-	 */
-	public function field_force_full_capture_render() {
-		$options = get_option( 'lom_settings' );
-		$val     = ( isset( $options['lom_force_full_capture'] ) ) ? $options['lom_force_full_capture'] : 'no';
-		?>
-		<input type="hidden" name="lom_settings[lom_force_full_capture]" value="no" />
-		<label for="lom_settings[lom_force_full_capture]">
-		<input type='checkbox' name='lom_settings[lom_force_full_capture]' value='yes' <?php checked( $val, 'yes' ); ?>>
-		<?php esc_html_e( 'Force the capture of a full order. Usefull if the Ledyer order has been updated by a ERP system.', 'ledyer-order-management-for-woocommerce' ); ?>
-		</label>
-		<?php
-	}
-
+	
 	/**
 	 * Adds order management to the settings pages.
 	 *
