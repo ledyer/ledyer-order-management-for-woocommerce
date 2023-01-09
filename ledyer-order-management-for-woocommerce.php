@@ -39,7 +39,7 @@ require_once __DIR__ . '/classes/class-ledyer-om-main.php';
  * Required minimums and constants
  */
 \define( 'LOM_WC_VERSION', Ledyer_Order_Management_For_WooCommerce::VERSION );
-\define( 'LOM_WC_MIN_PHP_VER', '4.0.0' );
+\define( 'LOM_WC_MIN_PHP_VER', '7.0.0' );
 \define( 'LOM_WC_MIN_WC_VER', '4.0.0' );
 \define( 'LOM_WC_MAIN_FILE', __FILE__ );
 \define( 'LOM_WC_PLUGIN_NAME', dirname( plugin_basename( LOM_WC_MAIN_FILE ) ) );
