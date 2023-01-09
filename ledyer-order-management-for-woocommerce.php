@@ -9,8 +9,8 @@
  * Text Domain: ledyer-order-management-for-woocommerce
  * Domain Path: /languages
  *
- * WC requires at least: 3.2.0
- * WC tested up to: 4.7.0
+ * WC requires at least: 4.0.0
+ * WC tested up to: 6.9.3
  *
  * Copyright (c) 2017-2023 Ledyer
  *
