@@ -96,7 +96,7 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		);
 
 		add_settings_field(
-			'lom_auto_capture',
+			'lom_capture_on_complete',
 			'On order completion',
 			array( $this, 'field_auto_capture_render' ),
 			'lom-settings',
@@ -132,7 +132,7 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		<input type="hidden" name="lom_settings[lom_auto_capture]" value="no" />
 		<label for="lom_settings[lom_auto_capture]" >
 			<input type='checkbox' name='lom_settings[lom_auto_capture]' value='yes' <?php checked( $val, 'yes' ); ?>>
-			<?php esc_html_e( 'Activate Ledyer order automatically when WooCommerce order is marked complete.', 'ledyer-order-management-for-woocommerce' ); ?>
+			<?php esc_html_e( 'Capture the Ledyer order automatically when WooCommerce order is marked complete.', 'ledyer-order-management-for-woocommerce' ); ?>
 		</label>
 		<?php
 	}
@@ -149,7 +149,7 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		<input type="hidden" name="lom_settings[lom_auto_cancel]" value="no" />
 		<label for="lom_settings[lom_auto_cancel]" >
 		<input type='checkbox' name='lom_settings[lom_auto_cancel]' value='yes' <?php checked( $val, 'yes' ); ?>>
-		<?php esc_html_e( 'Cancel Ledyer order automatically when WooCommerce order is marked canceled.', 'ledyer-order-management-for-woocommerce' ); ?>
+		<?php esc_html_e( 'Cancel the Ledyer order automatically when WooCommerce order is marked canceled.', 'ledyer-order-management-for-woocommerce' ); ?>
 		</label>
 		<?php
 	}
