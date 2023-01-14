@@ -33,8 +33,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 		// Capture an order.
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_ledyer_order' ) );
 
-		// Update an order TODO?
-		// add_action( 'woocommerce_saved_order_items', array( $this, 'update_ledyer_order_items' ), 10, 2 );
 	}
 
 	/**
