@@ -29,8 +29,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public function actions() {
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
 
-		// Cancel order. TODO
-		// add_action( 'woocommerce_order_status_cancelled', array( $this, 'cancel_ledyer_order' ) );
 
 		// Capture an order.
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_ledyer_order' ) );
