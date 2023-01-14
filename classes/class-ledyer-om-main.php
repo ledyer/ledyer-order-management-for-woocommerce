@@ -107,7 +107,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		}
 
 		// Only do ledyer capture on orders that was placed with Ledyer Checkout or Ledyer payments
-		// Not going to do this for non-KP and non-KCO orders.
+		// Not going to do this for non-KP and non-LCO orders.
 		$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
 		if (! $is_ledyer_order) {
 			return;
@@ -186,10 +186,10 @@ class Ledyer_Order_Management_For_WooCommerce {
 			$error_message = $capture_ledyer_order_response->get_error_message();
 
 			// if ( ! is_array( $error_message ) && false !== strpos( $error_message, 'Captured amount is higher than the remaining authorized amount.' ) ) {
-			// 	$error_message = str_replace( '. Capture not possible.', sprintf( ': %s %s.', $klarna_order->remaining_authorized_amount / 100, $klarna_order->purchase_currency ), $error_message );
+			// 	$error_message = str_replace( '. Capture not possible.', sprintf( ': %s %s.', $ledyer_order->remaining_authorized_amount / 100, $ledyer_order->purchase_currency ), $error_message );
 			// }
 
-			// translators: %s: Error message from Klarna.
+			// translators: %s: Error message from ledyer.
 			$order->add_order_note( sprintf( __( 'Could not capture Ledyer order. %s', 'ledyer-order-management-for-woocommerce' ), $error_message ) );
 
 		}
