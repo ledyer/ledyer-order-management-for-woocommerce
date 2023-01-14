@@ -96,7 +96,7 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		);
 
 		add_settings_field(
-			'lom_capture_on_complete',
+			'lom_auto_capture',
 			'On order completion',
 			array( $this, 'field_auto_capture_render' ),
 			'lom-settings',
