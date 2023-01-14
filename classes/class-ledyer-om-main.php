@@ -102,7 +102,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		}
 
 		// Only do ledyer capture on orders that was placed with Ledyer Checkout or Ledyer payments
-		// Not going to do this for non-KP and non-LCO orders.
+		// Not going to do this for non-LP and non-LCO orders.
 		$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
 		if (! $is_ledyer_order) {
 			return;
