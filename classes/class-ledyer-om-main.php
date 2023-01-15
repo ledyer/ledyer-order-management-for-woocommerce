@@ -28,6 +28,13 @@ class Ledyer_Order_Management_For_WooCommerce {
 	 */
 	public function actions() {
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
+
+		// Capture an order -> lom-capture.php
+		add_action(
+			'woocommerce_order_status_completed',
+			function ($order_id, $action = false) {
+				capture_ledyer_order($order_id, $action, $this->api); }
+		);
 	}
 
 	/**
@@ -69,22 +76,25 @@ class Ledyer_Order_Management_For_WooCommerce {
 		$this->api              = new API();
 
 		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array($this, 'plugin_action_links'));
-
-		// Dummy request just as a POC of working api-calls
-		$order = $this->api->get_order('or_2Jzwiy0aAXIvxRkFQQbQ11stizb');
-		$asdf = 'asdf';
 	}
 
 	public function include_files() {
+		// includes
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-functions.php';
+		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-types.php';
+		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-capture.php';
+
+		// classes
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-credentials.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
 		
+		// api
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-api.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/class-ledyer-om-request.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-get-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-capture-order.php';
 	}
 }
