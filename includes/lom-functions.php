@@ -10,9 +10,9 @@
 function order_placed_with_ledyer($payment_method) {
 	if ( in_array($payment_method, array('ledyer_payments', 'lco')) ) {
 		return true;
-	} else {
-		return false;
 	}
+
+	return false;
 }
 
 function get_first_captured($ledyer_order) {
