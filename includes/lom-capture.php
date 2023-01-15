@@ -57,19 +57,18 @@
 			return;
 		}
 
-		switch ($ledyer_order['status'][0]) {
-			case \LedyerOrderStatus::fullyCaptured:
-				$first_captured = get_first_captured($ledyer_order);
-				$captured_at = $first_captured['createdAt'];
-				$formatted_capture_at = date("Y-m-d H:i:s", strtotime($captured_at));
-				$capture_id = $first_captured['ledgerId'];
+		if (in_array( LedyerOrderStatus::fullyCaptured, $ledyer_order['status'])) {
+			$first_captured = get_first_captured($ledyer_order);
+			$captured_at = $first_captured['createdAt'];
+			$formatted_capture_at = date("Y-m-d H:i:s", strtotime($captured_at));
+			$capture_id = $first_captured['ledgerId'];
 
-				$order->add_order_note( 'Ledyer order has already been captured on ' . $formatted_capture_at );
-				update_post_meta( $order_id, '_wc_ledyer_capture_id', $capture_id );
-				return;
-			case \LedyerOrderStatus::cancelled:
-				$order->add_order_note( 'Ledyer order failed to capture, the order has already been cancelled' );
-				return;
+			$order->add_order_note( 'Ledyer order has already been captured on ' . $formatted_capture_at );
+			update_post_meta( $order_id, '_wc_ledyer_capture_id', $capture_id );
+			return;
+		} else if (in_array( LedyerOrderStatus::cancelled, $ledyer_order['status'] )) {
+			$order->add_order_note( 'Ledyer order failed to capture, the order has already been cancelled' );
+			return;
 		}
 
 		$capture_ledyer_order_response = $api->capture_order($ledyer_order_id);
