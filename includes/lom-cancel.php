@@ -20,6 +20,7 @@
 		$order = wc_get_order( $order_id );
 
 		// Check if the order has been paid. get_date_paid() gets a built in woocommerce property
+		// TODO: Should we make a note here? The ledyer order can not be cancelled at this point, is it ok to just let the ledyer-order/invoice expire and let the woo-order be cancelled?
 		if ( empty( $order->get_date_paid() ) ) {
 			return;
 		}
@@ -75,16 +76,11 @@
 			$order->add_order_note( 'Ledyer order cancelled.' );
       update_post_meta( $order_id, '_wc_ledyer_cancelled', 'yes', true );
 			return;
-		} else {
-
-    }
+		}
 
 		/*
-		 * Capture failed error handling
+		 * Cancel failed error handling
 		 * 
-		 * The suggested approach by Ledyer is to try again after some time.
-		 * If that still fails, the merchant should inform the customer,
-		 * and ask them to either "create a new subscription or add funds to their payment method if they wish to continue."
 		 */
 
 		$httpErrorCode = $cancel_ledyer_order_response->get_error_code();
@@ -109,6 +105,4 @@
 		}
 		
 		$order->add_order_note( __( $order_error_note ) );
-		$order->set_status( 'on-hold' );
-		$order->save();
 	}
