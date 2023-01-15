@@ -10,6 +10,7 @@ namespace LedyerOm;
 
 use LedyerOm\Requests\Order\Get_Order;
 use LedyerOm\Requests\Order\Capture_Order;
+use LedyerOm\Requests\Order\Cancel_Order;
 
 /**
  * API class.
@@ -28,5 +29,9 @@ class API {
 	
 	public function capture_order( $order_id ) {
     return ( new Capture_Order( array( 'orderId' => $order_id ) ) )->request();
+	}
+
+	public function cancel_order( $order_id ) {
+    return ( new Cancel_Order( array( 'orderId' => $order_id ) ) )->request();
 	}
 }
