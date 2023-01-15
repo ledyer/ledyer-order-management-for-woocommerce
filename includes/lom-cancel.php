@@ -61,10 +61,10 @@
     if ($ledyer_order['uncaptured'] == null) {
       $order->add_order_note( 'Ledyer order can not be cancelled because it has already been captured' );
       return;
-    } else if ( in_array($ledyer_order['status'], array(\LedyerOrderStatus::cancelled)) ) {
+    } else if ( in_array( LedyerOrderStatus::cancelled, $ledyer_order['status']) ) {
       $order->add_order_note( 'Ledyer order has already been cancelled' );
       return;
-    } else if ( 'advanceInvoice' == $ledyer_order['paymentMethod']['type'] && in_array($ledyer_order['status'], array(\LedyerOrderStatus::unacknowledged)) ) {
+    } else if ( 'advanceInvoice' == $ledyer_order['paymentMethod']['type'] && in_array( LedyerOrderStatus::unacknowledged, $ledyer_order['status'] ) ) {
       $order->add_order_note( 'Ledyer order of type Advanced invoice has already been acknowledged by Ledyer and can not be cancelled' );
       return;
     }
