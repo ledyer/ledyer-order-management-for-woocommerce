@@ -29,12 +29,33 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public function actions() {
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ] );
 
+		// Add refunds support to Ledyer Payments and Ledyer Checkout gateways.
+		add_action( 'wc_ledyer_payments_supports', array( $this, 'add_gateway_support' ) );
+		add_action( 'lco_wc_supports', array( $this, 'add_gateway_support' ) );
+
 		// Capture an order -> lom-capture.php
 		add_action(
 			'woocommerce_order_status_completed',
 			function ($order_id, $action = false) {
-				capture_ledyer_order($order_id, $action, $this->api); }
+				capture_ledyer_order($order_id, $action, $this->api);
+			}
 		);
+
+		// Listen to refund from Ledyer Checkout for Woocommerce, then call refund_ledyer_order -> lom-refund.php
+		add_filter(
+			'wc_ledyer_checkout_process_refund',
+			function ($result, $order_id, $amount, $reason) {
+				return refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+			},
+			10, 4);
+		
+		// Listen to refund from Ledyer Payments for Woocommerce, then call refund_ledyer_order -> lom-refund.php
+		add_filter(
+			'wc_ledyer_payments_process_refund',
+			function ($result, $order_id, $amount, $reason) {
+				return refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+			},
+			10, 4);
 	}
 
 	/**
@@ -78,11 +99,25 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_filter( 'plugin_action_links_' . plugin_basename( LOM_WC_MAIN_FILE ), array($this, 'plugin_action_links'));
 	}
 
+	/**
+	 * Add refunds support to Klarna Payments gateway.
+	 *
+	 * @param array $features Supported features.
+	 *
+	 * @return array $features Supported features.
+	 */
+	public function add_gateway_support( $features ) {
+		$features[] = 'refunds';
+
+		return $features;
+	}
+
 	public function include_files() {
 		// includes
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-functions.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-types.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-capture.php';
+		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-refund.php';
 
 		// classes
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
@@ -94,7 +129,11 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-api.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/class-ledyer-om-request.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-order.php';
+
+		// api endpoints
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-payment-status.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-get-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-capture-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-refund-order.php';
 	}
 }
