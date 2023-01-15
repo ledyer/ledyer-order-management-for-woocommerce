@@ -56,6 +56,14 @@ class Ledyer_Order_Management_For_WooCommerce {
 				return refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
 			},
 			10, 4);
+		
+		// Cancel an order -> lom-cancel.php
+		add_action(
+			'woocommerce_order_status_cancelled',
+			function ($order_id, $action = false) {
+				cancel_ledyer_order($order_id, $action, $this->api);
+      }
+		);
 	}
 
 	/**
@@ -118,6 +126,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-types.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-capture.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-refund.php';
+		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-cancel.php';
 
 		// classes
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
@@ -135,5 +144,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-get-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-capture-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-refund-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-cancel-order.php';
 	}
 }

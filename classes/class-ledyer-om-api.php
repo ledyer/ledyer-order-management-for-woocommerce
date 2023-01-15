@@ -12,6 +12,7 @@ use LedyerOm\Requests\Order\Payment_Status;
 use LedyerOm\Requests\Order\Get_Order;
 use LedyerOm\Requests\Order\Capture_Order;
 use LedyerOm\Requests\Order\Refund_Order;
+use LedyerOm\Requests\Order\Cancel_Order;
 
 /**
  * API class.
@@ -38,5 +39,9 @@ class API {
 
 	public function refund_order( $order_id, $ledger_id ) {
     return ( new Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id ) ) )->request();
+  }
+
+	public function cancel_order( $order_id ) {
+    return ( new Cancel_Order( array( 'orderId' => $order_id ) ) )->request();
 	}
 }
