@@ -7,6 +7,7 @@
  *
  * @param int  $order_id Order ID.
  * @param bool $action If this was triggered by an action.
+ * @param $api The lom api instance
  */
 	function capture_ledyer_order($order_id, $action = false, $api)
 	{
