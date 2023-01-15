@@ -19,3 +19,8 @@ function get_first_captured($ledyer_order) {
 	$captured = $ledyer_order['captured'];
 	return $captured[0];
 }
+
+// We only accept full refunds, so the refunded amount must be the same as the woo-orders total amount
+function ledyer_om_ensure_refund_full_order_amount($amount, $order, $ledyer_order) {
+	return $order->get_total() == $amount;
+}
