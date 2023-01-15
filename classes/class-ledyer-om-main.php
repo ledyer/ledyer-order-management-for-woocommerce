@@ -100,7 +100,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	}
 
 	/**
-	 * Add refunds support to Klarna Payments gateway.
+	 * Add refunds support to Ledyer Payments gateway.
 	 *
 	 * @param array $features Supported features.
 	 *
