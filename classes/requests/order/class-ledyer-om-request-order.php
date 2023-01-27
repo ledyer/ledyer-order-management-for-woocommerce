@@ -22,7 +22,7 @@ abstract class Request_Order extends Request {
 	protected function set_request_url() {
 
 		$this->request_url = 'https://api.live.ledyer.com/';
-    $environment = ledyerOm()->parentSettings->get_test_environment();
+		$environment = ledyerOm()->parentSettings->get_test_environment();
 
 		if ( parent::is_test() ) {
 
