@@ -175,11 +175,9 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 	 */
 	public function add_page_tabs( $current = 'settings' ) {
 		$tabs  = array(
-			'addons'   => __( 'Ledyer Add-ons', 'ledyer-checkout-for-woocommerce' ),
 			'settings' => __( 'Settings', 'ledyer-checkout-for-woocommerce' ),
 		);
 		$pages = array(
-			'addons'   => 'checkout-addons',
 			'settings' => 'lom-settings',
 		);
 		?>
