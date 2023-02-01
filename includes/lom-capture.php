@@ -9,23 +9,21 @@
  * @param bool $action If this was triggered by an action.
  * @param $api The lom api instance
  */
-	function capture_ledyer_order($order_id, $action = false, $api)
-	{
+	function capture_ledyer_order($order_id, $action = false, $api) {
 		$options = get_option( 'lom_settings' );
-		// if the capture on complete is not enabled in lom-settings
+		// If the capture on complete is not enabled in lom-settings
 		if ( 'no' === $options['lom_auto_capture']) {
 			return;
 		}
 
 		$order = wc_get_order( $order_id );
 
-		// Check if the order has been paid. get_date_paid() gets a built in woocommerce property
+		// Check if the order has been paid.
 		if ( empty( $order->get_date_paid() ) ) {
 			return;
 		}
 
-		// Only do ledyer capture on orders that was placed with Ledyer Checkout or Ledyer payments
-		// Not going to do this for non-LP and non-LCO orders.
+		// Only support Ledyer orders
 		$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
 		if (! $is_ledyer_order) {
 			return;
@@ -41,9 +39,7 @@
 
 		// Do nothing if we don't have Ledyer order ID.
 		if ( ! $ledyer_order_id && ! get_post_meta( $order_id, '_transaction_id', true ) ) {
-			$order->add_order_note( 'Ledyer order ID is missing, Ledyer order could not be captured at this time.' );
-			$order->set_status( 'on-hold' );
-			$order->save();
+			$order->update_status( 'on-hold', 'Ledyer order ID is missing, Ledyer order could not be captured at this time.' );
 			return;
 		}
 
@@ -51,10 +47,8 @@
 		$ledyer_order = $api->get_order($ledyer_order_id);
 
 		if ( is_wp_error( $ledyer_order ) ) {
-			$order->add_order_note( 'Ledyer order could not be captured due to an error. Ordet set to On hold' );
-			$order->set_status( 'on-hold' );
-			$order->save();
-			return;
+			$errmsg = 'Ledyer order could not be captured due to an error: ' . $ledyer_order->get_error_message();
+			$order->update_status( 'on-hold', $errmsg );
 		}
 
 		if (in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'])) {
@@ -71,10 +65,10 @@
 			return;
 		}
 
-		$capture_ledyer_order_response = $api->capture_order($ledyer_order_id);
+		$response = $api->capture_order($ledyer_order_id);
 		
-		if (!is_wp_error($capture_ledyer_order_response)) {
-			$first_captured = get_first_captured($capture_ledyer_order_response);
+		if (!is_wp_error($response)) {
+			$first_captured = get_first_captured($response);
 			$capture_id = $first_captured['ledgerId'];
 
 			$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
@@ -82,36 +76,6 @@
 			return;
 		}
 
-		/*
-		 * Capture failed error handling
-		 * 
-		 * The suggested approach by Ledyer is to try again after some time.
-		 * If that still fails, the merchant should inform the customer,
-		 * and ask them to either "create a new subscription or add funds to their payment method if they wish to continue."
-		 */
-
-		$httpErrorCode = $capture_ledyer_order_response->get_error_code();
-		$httpErrorMessage = $capture_ledyer_order_response->get_error_message();
-		$order = wc_get_order( $order_id );
-
-		if (isset($httpErrorCode)) {
-			$order_error_note = null;
-
-			switch ($httpErrorCode) {
-				case 401:
-					$order_error_note = 'Ledyer could not charge the customer. The capture was unauthorized, ' . $httpErrorMessage;
-				case 403:
-					$order_error_note = 'Ledyer could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue. ' . $httpErrorMessage;
-				case 404:
-					$order_error_note = 'Ledyer could not charge the customer, ' . $httpErrorMessage;
-				default:
-					$order_error_note = 'Ledyer could not charge the customer, ' . $httpErrorMessage;
-			}
-		} else {
-			$order_error_note = 'Ledyer could not charge the customer, an unhandled exception was encounted, ' . $httpErrorMessage;
-		}
-		
-		$order->add_order_note( __( $order_error_note ) );
-		$order->set_status( 'on-hold' );
-		$order->save();
+		$errmsg = 'Ledyer order could not be captured due to an error: ' . $response->get_error_message();
+		$order->update_status( 'on-hold', $errmsg);
 	}

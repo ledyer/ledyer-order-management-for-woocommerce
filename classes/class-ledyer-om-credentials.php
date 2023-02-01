@@ -22,34 +22,30 @@ class Credentials {
 	 * Credentials constructor.
 	 */
 	public function set_settings() {
-    // First try and get credentials from Ledyer checkout
+		// First try and get credentials from Ledyer checkout
 		self::$settings = get_option( 'woocommerce_lco_settings' );
-
-    // If that is not found, try and get from Ledyer Payments (to be developed)
+		// If that is not found, try and get from Ledyer Payments (to be developed)
 	}
 
 	/**
-	 * Gets Ledyer API credentials (merchant ID and shared secret) from user session.
+	 * Gets Ledyer API credentials
 	 *
 	 * @return bool|array $credentials
 	 */
-	public function get_credentials_from_session() {
-
+	public function get_client_credentials() {
 		$test_string   = 'yes' === self::$settings['testmode'] ? 'test_' : '';
-		$merchant_id   = self::$settings[ $test_string . 'merchant_id' ];
-		$shared_secret = self::$settings[ $test_string . 'shared_secret' ];
+		$client_id   = self::$settings[ $test_string . 'merchant_id' ];
+		$client_secret = self::$settings[ $test_string . 'shared_secret' ];
 
-		// Merchant id and/or shared secret not found for matching country.
-		if ( '' === $merchant_id || '' === $shared_secret ) {
+		if ( '' === $client_id || '' === $client_secret ) {
 			return false;
 		}
 
 		$credentials = array(
-			'merchant_id'   => self::$settings[ $test_string . 'merchant_id' ],
-			'shared_secret' => htmlspecialchars_decode( self::$settings[ $test_string . 'shared_secret' ] ),
-			'store_id'      => self::$settings[ $test_string . 'store_id' ]
+			'client_id'   => $client_id,
+			'client_secret' => htmlspecialchars_decode( $client_secret ),
 		);
 
-		return apply_filters( 'lco_wc_credentials_from_session', $credentials, self::$settings['testmode'] );
+		return $credentials;
 	}
 }

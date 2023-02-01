@@ -74,9 +74,6 @@ abstract class Request {
 			return get_transient( 'ledyer_token' );
 		}
 
-		$client_credentials = ledyerOm()->credentials->get_credentials_from_session();
-
-
 		$api_auth_base = 'https://auth.live.ledyer.com/';
 
 		$environment = ledyerOm()->parentSettings->get_test_environment();
@@ -97,9 +94,10 @@ abstract class Request {
 		}
 
 		$client = new \WP_Http();
+		$client_credentials = ledyerOm()->credentials->get_client_credentials();
 
 		$headers = [
-			'Authorization' => 'Basic ' . base64_encode( $client_credentials['merchant_id'] . ':' . $client_credentials['shared_secret'] ),
+			'Authorization' => 'Basic ' . base64_encode( $client_credentials['client_id'] . ':' . $client_credentials['client_secret'] ),
 		];
 
 		$response = $client->post( $api_auth_base . 'oauth/token?grant_type=client_credentials', [
@@ -127,10 +125,28 @@ abstract class Request {
 	public function request() {
 		$url  = $this->get_request_url();
 		$args = $this->get_request_args();
+		$headers = [
+			'Idempotency-Key' => wp_generate_uuid4(),
+		];
+		$args['headers'] = array_merge($args['headers'], $headers);
+		return $this->do_request($url, $args);
+	}
 
+	/** internal retry helper with exponential backoff */
+	protected function do_request($url, $args, $maxRetries = 4, $delay = 0.5, $exp = 2) {
 		$response = wp_remote_request( $url, $args );
-
-		return $this->process_response( $response, $args, $url );
+		$parsed = $this->process_response( $response, $args, $url );
+		if ( is_wp_error( $parsed ) ) {
+			$http_response_code = wp_remote_retrieve_response_code( $response );
+			// retry connection, timeout errors etc + all http 500 and above
+			$retry = is_string($http_response_code) || $http_response_code > 499;
+			if ($retry && $maxRetries > 0) {
+				usleep($delay * 1E6);
+				return $this->do_request($url, $args, $maxRetries - 1, $delay * $exp, $exp);
+			}
+			return $parsed;
+		}
+		return $parsed;
 	}
 
 	/**
