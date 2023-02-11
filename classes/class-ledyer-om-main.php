@@ -18,7 +18,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION = '1.0.0';
+	const VERSION = '1.1.0';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
@@ -62,7 +62,15 @@ class Ledyer_Order_Management_For_WooCommerce {
 			'woocommerce_order_status_cancelled',
 			function ($order_id, $action = false) {
 				cancel_ledyer_order($order_id, $action, $this->api);
-      }
+			}
+		);
+
+		// Update an order.
+		add_action(
+			'woocommerce_saved_order_items',
+			function ($order_id, $action = false) {
+				edit_ledyer_order($order_id, $action, $this->api);
+			}
 		);
 	}
 
@@ -97,6 +105,8 @@ class Ledyer_Order_Management_For_WooCommerce {
 			return;
 		}
 
+		require_once LOM_WC_PLUGIN_PATH . '/vendor/autoload.php';
+
 		$this->include_files();
 		$this->set_settings();
 
@@ -127,13 +137,15 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-capture.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-refund.php';
 		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-cancel.php';
+		include_once LOM_WC_PLUGIN_PATH . '/includes/lom-edit.php';
 
 		// classes
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-credentials.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
-		
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-order-mapper.php';
+
 		// api
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-api.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/class-ledyer-om-request.php';
@@ -145,5 +157,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-capture-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-refund-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-cancel-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-edit-order.php';
+
 	}
 }

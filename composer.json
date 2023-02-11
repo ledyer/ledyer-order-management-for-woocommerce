@@ -1,0 +1,6 @@
+{
+    "_note_": "using an older version of brick/money to support from PHP 7.1 and greater",
+    "require": {
+        "brick/money": "0.5.3"
+    }
+}
