@@ -13,7 +13,7 @@ use LedyerOm\Requests\Order\Get_Order;
 use LedyerOm\Requests\Order\Capture_Order;
 use LedyerOm\Requests\Order\Refund_Order;
 use LedyerOm\Requests\Order\Cancel_Order;
-
+use LedyerOm\Requests\Order\Edit_Order;
 /**
  * API class.
  *
@@ -43,5 +43,9 @@ class API {
 
 	public function cancel_order( $order_id ) {
 		return ( new Cancel_Order( array( 'orderId' => $order_id ) ) )->request();
+	}
+
+	public function edit_order( $order_id, $data ) {
+		return ( new Edit_Order( array('orderId' => $order_id, 'data'    => $data ) ) )->request();
 	}
 }

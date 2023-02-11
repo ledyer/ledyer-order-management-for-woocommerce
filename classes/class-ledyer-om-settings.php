@@ -109,6 +109,13 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 			'lom-settings',
 			'lom_settings_section'
 		);
+		add_settings_field(
+			'lom_auto_update',
+			'On order update',
+			array( $this, 'field_auto_update_render' ),
+			'lom-settings',
+			'lom_settings_section'
+		);
 	}
 
 	/**
@@ -150,6 +157,23 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		<label for="lom_settings[lom_auto_cancel]" >
 		<input type='checkbox' name='lom_settings[lom_auto_cancel]' value='yes' <?php checked( $val, 'yes' ); ?>>
 		<?php esc_html_e( 'Cancel the Ledyer order automatically when WooCommerce order is marked canceled.', 'ledyer-order-management-for-woocommerce' ); ?>
+		</label>
+		<?php
+	}
+
+	/**
+	 * HTML For the input field.
+	 *
+	 * @return void
+	 */
+	public function field_auto_update_render() {
+		$options = get_option( 'lom_settings' );
+		$val     = ( isset( $options['lom_auto_update'] ) ) ? $options['lom_auto_update'] : 'yes';
+		?>
+		<input type="hidden" name="kom_settings[lom_auto_update]" value="no" />
+		<label for="kom_settings[lom_auto_update]" >
+		<input type='checkbox' name='kom_settings[lom_auto_update]' value='yes' <?php checked( $val, 'yes' ); ?>>
+		<?php esc_html_e( 'Update Ledyer order automatically when WooCommerce order is updated.', 'ledyer-order-management-for-woocommerce' ); ?>
 		</label>
 		<?php
 	}
