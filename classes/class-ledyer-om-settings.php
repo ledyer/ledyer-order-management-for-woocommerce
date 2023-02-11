@@ -170,9 +170,9 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		$options = get_option( 'lom_settings' );
 		$val     = ( isset( $options['lom_auto_update'] ) ) ? $options['lom_auto_update'] : 'yes';
 		?>
-		<input type="hidden" name="kom_settings[lom_auto_update]" value="no" />
-		<label for="kom_settings[lom_auto_update]" >
-		<input type='checkbox' name='kom_settings[lom_auto_update]' value='yes' <?php checked( $val, 'yes' ); ?>>
+		<input type="hidden" name="lom_settings[lom_auto_update]" value="no" />
+		<label for="lom_settings[lom_auto_update]" >
+		<input type='checkbox' name='lom_settings[lom_auto_update]' value='yes' <?php checked( $val, 'yes' ); ?>>
 		<?php esc_html_e( 'Update Ledyer order automatically when WooCommerce order is updated.', 'ledyer-order-management-for-woocommerce' ); ?>
 		</label>
 		<?php
