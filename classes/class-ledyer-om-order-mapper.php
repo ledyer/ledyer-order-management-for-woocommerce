@@ -43,13 +43,6 @@ class OrderMapper {
 
 
 	/**
-	 * WooCommerce order ID.
-	 *
-	 * @var int
-	 */
-	public $order_id;
-
-	/**
 	 * WooCommerce order.
 	 *
 	 * @var bool|WC_Order|WC_Order_Refund
