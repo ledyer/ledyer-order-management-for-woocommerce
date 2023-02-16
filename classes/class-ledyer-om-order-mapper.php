@@ -116,20 +116,6 @@ class OrderMapper {
 		);
 	}
 
-    /*private function process_order_item_fee( $order_item, $order, $ledyerType) {
-		return array(
-			'type'                  => $ledyerType,
-			'reference'             => $this->get_item_reference( $order_item ),
-			'description'           => $this->get_item_name( $order_item ),
-			'quantity'              => 1,
-			'unitPrice'             => $this->get_item_unit_price( $order_item, $order->get_currency()),
-			'unitDiscountAmount'    => $this->get_item_discount_amount( $order_item, $order->get_currency()),
-			'vat'                   => $this->get_item_tax_rate( $order, $order_item ),
-			'totalAmount'           => $this->get_item_total_amount( $order_item, $order->get_currency()),
-			'totalVatAmount'        => $this->get_item_tax_amount( $order_item, $order->get_currency()),
-		);
-	}*/
-
 	private function get_item_type( $order_line_item ) {
 		$product = $order_line_item->get_product();
 		return $product && ! $product->is_virtual() ? 'physical' : 'digital';
@@ -172,11 +158,6 @@ class OrderMapper {
 			return 1;
 		}
 	}
-
-	/*public static function get_unit_price( $order_item ) {
-		$unit_price = ( $order_item->get_total() ) / $order_item->get_quantity();
-		return self::format_number( $unit_price );
-	}*/
 
 	private function get_item_unit_price( $order_line_item, $currency) {
 		if ( 'shipping' === $order_line_item->get_type() || 'fee' === $order_line_item->get_type() ) {
