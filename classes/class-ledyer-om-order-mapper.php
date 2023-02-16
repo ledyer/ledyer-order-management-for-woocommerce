@@ -7,6 +7,7 @@
 namespace LedyerOm;
 
 use Brick\Money\Money;
+use Brick\Math\RoundingMode;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -61,10 +62,10 @@ class OrderMapper {
 	public function woo_to_ledyer_order_lines() {
 		$this->process_order_line_items();
 		return array(
-			'orderLines'				=> $this->ledyer_order_lines,
-			'totalOrderAmount'			=> $this->ledyer_total_order_amount,
-			'totalOrderAmountExclVat'	=> $this->ledyer_total_order_amount_excl_vat,
-			'totalOrderVatAmount' 		=> $this->ledyer_total_order_vat_amount,
+			'orderLines'                => $this->ledyer_order_lines,
+			'totalOrderAmount'          => $this->ledyer_total_order_amount,
+			'totalOrderAmountExclVat'   => $this->ledyer_total_order_amount_excl_vat,
+			'totalOrderVatAmount'       => $this->ledyer_total_order_vat_amount,
 		);
 	}
 
@@ -77,8 +78,8 @@ class OrderMapper {
 		$this->order->calculate_taxes();
 		$this->order->calculate_totals();
 
-		$total = Money::of($this->order->get_total(), $this->order->get_currency());
-		$totalTax = Money::of($this->order->get_total_tax(), $this->order->get_currency());
+		$total = Money::of($this->order->get_total(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
+		$totalTax = Money::of($this->order->get_total_tax(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
 		$totalExclTax = $total->minus($totalTax);
 		$this->ledyer_total_order_amount = $total->getMinorAmount()->toInt();
 		$this->ledyer_total_order_vat_amount  = $totalTax->getMinorAmount()->toInt();
@@ -91,21 +92,43 @@ class OrderMapper {
 				$this->ledyer_order_lines[] = $order_line_item;
 			}
 		}
+
+		foreach ( $this->order->get_items( 'shipping' ) as $order_item ) {
+			$this->ledyer_order_lines[] = $this->process_order_item( $order_item, $this->order, 'shippingFee', 1);
+		}
+
+		foreach ( $this->order->get_items( 'fee' ) as $order_item ) {
+			$this->ledyer_order_lines[] = $this->process_order_item( $order_item, $this->order, 'surcharge', 1 );
+		}
 	}
 
-	private function process_order_item( $order_item, $order ) {
+	private function process_order_item( $order_item, $order, $ledyerType = null, $quantity = null) {
 		return array(
-			'type'					=> $this->get_item_type( $order_item ),
-			'reference'				=> $this->get_item_reference( $order_item ),
-			'description'			=> $this->get_item_name( $order_item ),
-			'quantity'				=> $this->get_item_quantity( $order_item ),
-			'unitPrice'				=> $this->get_item_unit_price( $order_item, $order->get_currency()),
-			'unitDiscountAmount'	=> $this->get_item_discount_amount( $order_item, $order->get_currency()),
-			'vat'					=> $this->get_item_tax_rate( $order, $order_item ),
-			'totalAmount'			=> $this->get_item_total_amount( $order_item, $order->get_currency()),
-			'totalVatAmount'		=> $this->get_item_tax_amount( $order_item, $order->get_currency()),
+			'type'                  => $ledyerType ? $ledyerType : $this->get_item_type( $order_item ),
+			'reference'             => $this->get_item_reference( $order_item ),
+			'description'           => $this->get_item_name( $order_item ),
+			'quantity'              => $quantity ? $quantity : $this->get_item_quantity( $order_item ),
+			'unitPrice'             => $this->get_item_unit_price( $order_item, $order->get_currency()),
+			'unitDiscountAmount'    => $this->get_item_discount_amount( $order_item, $order->get_currency()),
+			'vat'                   => $this->get_item_tax_rate( $order, $order_item ),
+			'totalAmount'           => $this->get_item_total_amount( $order_item, $order->get_currency()),
+			'totalVatAmount'        => $this->get_item_tax_amount( $order_item, $order->get_currency()),
 		);
 	}
+
+    /*private function process_order_item_fee( $order_item, $order, $ledyerType) {
+		return array(
+			'type'                  => $ledyerType,
+			'reference'             => $this->get_item_reference( $order_item ),
+			'description'           => $this->get_item_name( $order_item ),
+			'quantity'              => 1,
+			'unitPrice'             => $this->get_item_unit_price( $order_item, $order->get_currency()),
+			'unitDiscountAmount'    => $this->get_item_discount_amount( $order_item, $order->get_currency()),
+			'vat'                   => $this->get_item_tax_rate( $order, $order_item ),
+			'totalAmount'           => $this->get_item_total_amount( $order_item, $order->get_currency()),
+			'totalVatAmount'        => $this->get_item_tax_amount( $order_item, $order->get_currency()),
+		);
+	}*/
 
 	private function get_item_type( $order_line_item ) {
 		$product = $order_line_item->get_product();
@@ -150,11 +173,13 @@ class OrderMapper {
 		}
 	}
 
+	/*public static function get_unit_price( $order_item ) {
+		$unit_price = ( $order_item->get_total() ) / $order_item->get_quantity();
+		return self::format_number( $unit_price );
+	}*/
+
 	private function get_item_unit_price( $order_line_item, $currency) {
-		if ( 'shipping' === $order_line_item->get_type() ) {
-			$item_price = $this->order->get_shipping_total() + $this->order->get_shipping_tax();
-			$item_quantity = 1;
-		} elseif ( 'fee' === $order_line_item->get_type() ) {
+		if ( 'shipping' === $order_line_item->get_type() || 'fee' === $order_line_item->get_type() ) {
 			$item_price = $order_line_item->get_total() + $order_line_item->get_total_tax();
 			$item_quantity = 1;
 		} elseif ( 'coupon' === $order_line_item->get_type() ) {
@@ -165,8 +190,8 @@ class OrderMapper {
 			$item_quantity = $order_line_item->get_quantity() ? $order_line_item->get_quantity() : 1;
 		}
 
-		$money = Money::of( $item_price, $currency );
-		$money = $money->dividedBy( $item_quantity );
+		$money = Money::of( $item_price, $currency, null, RoundingMode::HALF_UP);
+		$money = $money->dividedBy( $item_quantity, RoundingMode::HALF_UP);
 		return $money->getMinorAmount()->toInt();
 	}
 
@@ -189,9 +214,7 @@ class OrderMapper {
 	}
 
 	private function get_item_total_amount( $order_line_item, $currency ) {
-		if ( 'shipping' === $order_line_item->get_type() ) {
-			$item_total_amount = $this->order->get_shipping_total() + (float) $this->order->get_shipping_tax();
-		} elseif ( 'fee' === $order_line_item->get_type() ) {
+		if ( 'shipping' === $order_line_item->get_type() || 'fee' === $order_line_item->get_type() ) {
 			$item_total_amount = $order_line_item->get_total() + $order_line_item->get_total_tax();
 		} elseif ( 'coupon' === $order_line_item->get_type() ) {
 			$item_total_amount = $order_line_item->get_discount();
@@ -203,14 +226,14 @@ class OrderMapper {
 
 	private function get_item_discount_amount( $order_line_item, $currency ) {
 		if ( $order_line_item['subtotal'] > $order_line_item['total'] ) {
-			$item_discount_amount = ( $order_line_item['subtotal'] + $order_line_item['subtotal_tax'] - $order_line_item['total'] - $order_line_item['total_tax'] ) * 100;
+			$item_discount_amount = ( $order_line_item['subtotal'] + $order_line_item['subtotal_tax'] - $order_line_item['total'] - $order_line_item['total_tax'] );
 		} else {
 			$item_discount_amount = 0;
 		}
 
-		$money = Money::of($item_discount_amount, $currency);
+		$money = Money::of($item_discount_amount, $currency, null, RoundingMode::HALF_UP);
 		$quantity = $this->get_item_quantity( $order_line_item);
-		$money = $money->dividedBy($quantity);
+		$money = $money->dividedBy($quantity, RoundingMode::HALF_UP);
 		return $money->getMinorAmount()->toInt();
 	}
 
@@ -227,7 +250,7 @@ class OrderMapper {
 	}
 
 	private function amount_to_minor($amount, $currency) {
-		$money = Money::of($amount, $currency);
+		$money = Money::of($amount, $currency, null, RoundingMode::HALF_UP);
 		return $money->getMinorAmount()->toInt();
 	}
 
