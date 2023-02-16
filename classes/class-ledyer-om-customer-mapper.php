@@ -33,8 +33,8 @@ class CustomerMapper {
 	}
 
 	private function process_billing() {
-		$attentionName = get_post_meta($order_id, '_billing_attention_name', true);
-		$careOf = get_post_meta($order_id, '_billing_care_of', true);
+		$attentionName = get_post_meta($this->order->get_id(), '_billing_attention_name', true);
+		$careOf = get_post_meta($this->order->get_id(), '_billing_care_of', true);
 		return array(
 			'companyName'		=> $this->order->get_billing_company(),
 			'streetAddress'		=> $this->order->get_billing_address_1(),
@@ -57,10 +57,11 @@ class CustomerMapper {
 	}
 
 	private function process_shipping_contact() {
+		$shipping_email = get_post_meta($this->order->get_id(), '_shipping_email', true);
 		return array(
 			'firstName'	=> $this->order->get_shipping_first_name(),
 			'lastName'	=> $this->order->get_shipping_last_name(),
-			//'email'		=> $this->order->get_billing_email(),
+			'email'		=> !empty( $shipping_email ) ? $shipping_email : "",
 			'phone'		=> $this->order->get_shipping_phone(),
 		);
 	}
