@@ -96,6 +96,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 				foreach ($trace as $i => $t) {
 					if ($t['class'] === "WC_Meta_Box_Order_Data" && $t['function'] === "save") {
 						$valid = true;
+						break;
 					}
 				}
 				if ($valid) {
