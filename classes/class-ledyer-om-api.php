@@ -35,8 +35,8 @@ class API {
 		return ( new Get_Order( array( 'orderId' => $order_id ) ) )->request();
 	}
 	
-	public function capture_order( $order_id ) {
-		return ( new Capture_Order( array( 'orderId' => $order_id ) ) )->request();
+	public function capture_order( $order_id, $data ) {
+		return ( new Capture_Order( array( 'orderId' => $order_id, 'data' => $data ) ) )->request();
 	}
 
 	public function refund_order( $order_id, $ledger_id ) {

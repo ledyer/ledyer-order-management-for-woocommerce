@@ -53,7 +53,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 
 	if ("order" === $syncType) {
 		$orderMapper = new \LedyerOm\OrderMapper($order);
-		$data = $orderMapper->woo_to_ledyer_order_lines();
+		$data = $orderMapper->woo_to_ledyer_edit_order_lines();
 		$response = $api->edit_order($ledyer_order_id, $data);
 		if (!is_wp_error($response)) {
 			$order->add_order_note( 'Ledyer order updated.' );

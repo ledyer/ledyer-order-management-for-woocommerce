@@ -59,13 +59,21 @@ class OrderMapper {
 		$this->order = $order;
 	}
 
-	public function woo_to_ledyer_order_lines() {
+	public function woo_to_ledyer_edit_order_lines() {
 		$this->process_order_line_items();
 		return array(
 			'orderLines'                => $this->ledyer_order_lines,
 			'totalOrderAmount'          => $this->ledyer_total_order_amount,
 			'totalOrderAmountExclVat'   => $this->ledyer_total_order_amount_excl_vat,
 			'totalOrderVatAmount'       => $this->ledyer_total_order_vat_amount,
+		);
+	}
+
+	public function woo_to_ledyer_capture_order_lines() {
+		$this->process_order_line_items();
+		return array(
+			'orderLines'                => $this->ledyer_order_lines,
+			'totalCaptureAmount'        => $this->ledyer_total_order_amount,
 		);
 	}
 
