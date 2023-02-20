@@ -65,11 +65,44 @@ class Ledyer_Order_Management_For_WooCommerce {
 			}
 		);
 
-		// Update an order.
+		// Sync order items and totals
 		add_action(
 			'woocommerce_saved_order_items',
 			function ($order_id, $action = false) {
-				edit_ledyer_order($order_id, $action, $this->api);
+				edit_ledyer_order($order_id, $action, $this->api, "order");
+			}
+		);
+
+		// Sync customer details such as shipping and billing
+		add_action(
+			'woocommerce_after_order_object_save',
+			function ($order, $action = false) {
+
+				// We need to restrict this to run only once
+				// This action is triggered multiple times by default (via tax calc etc) and with "stale" values for ex. billing, shipping.
+				// So we need to make sure we only execute woo->ledyer sync for:
+				// 1. only run for admin
+				// 2. only run when coming from meta box save
+
+				// Also we can't combine order items sync in here as it will end up in a circular lopp
+				// as the OrderMapper triggers new order save for tax calc etc.
+
+				if (!is_admin()) {
+					return;
+				}
+
+				$trace = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT|DEBUG_BACKTRACE_IGNORE_ARGS,0);
+				$valid = false;
+				foreach ($trace as $i => $t) {
+					if ($t['class'] === "WC_Meta_Box_Order_Data" && $t['function'] === "save") {
+						$valid = true;
+						break;
+					}
+				}
+				if ($valid) {
+					$order_id = $order->get_id();
+					edit_ledyer_order($order_id, $action, $this->api, "customer");
+				}
 			}
 		);
 	}
@@ -145,6 +178,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-order-mapper.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-customer-mapper.php';
 
 		// api
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-api.php';
@@ -158,6 +192,8 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-refund-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-cancel-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-edit-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-edit-customer.php';
+
 
 	}
 }
