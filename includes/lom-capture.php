@@ -65,7 +65,10 @@
 			return;
 		}
 
-		$response = $api->capture_order($ledyer_order_id);
+
+		$orderMapper = new \LedyerOm\OrderMapper($order);
+		$data = $orderMapper->woo_to_ledyer_capture_order_lines();
+		$response = $api->capture_order($ledyer_order_id, $data);
 		
 		if (!is_wp_error($response)) {
 			$first_captured = get_first_captured($response);
