@@ -52,6 +52,7 @@ class CustomerMapper {
 			'streetAddress'	=> $this->order->get_shipping_address_1(),
 			'postalCode'	=> $this->order->get_shipping_postcode(),
 			'city'			=> $this->order->get_shipping_city(),
+			'country'		=> $this->order->get_shipping_country(),
 			'contact' => $this->process_shipping_contact(),
 		);
 	}

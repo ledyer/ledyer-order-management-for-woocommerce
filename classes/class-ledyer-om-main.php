@@ -87,24 +87,36 @@ class Ledyer_Order_Management_For_WooCommerce {
 				// Also we can't combine order items sync in here as it will end up in a circular lopp
 				// as the OrderMapper triggers new order save for tax calc etc.
 
-				if (!is_admin()) {
+				if (!is_admin() || !$this->is_metabox_save()) {
 					return;
 				}
-
-				$trace = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT|DEBUG_BACKTRACE_IGNORE_ARGS,0);
-				$valid = false;
-				foreach ($trace as $i => $t) {
-					if ($t['class'] === "WC_Meta_Box_Order_Data" && $t['function'] === "save") {
-						$valid = true;
-						break;
-					}
-				}
-				if ($valid) {
-					$order_id = $order->get_id();
-					edit_ledyer_order($order_id, $action, $this->api, "customer");
-				}
+				$order_id = $order->get_id();
+				edit_ledyer_order($order_id, $action, $this->api, "customer");
 			}
 		);
+
+		// Validate customer details such as shipping and billing
+		add_action(
+			'woocommerce_before_order_object_save',
+			function ($order, $action = false) {
+				if (!is_admin() || !$this->is_metabox_save()) {
+					return;
+				}
+				validate_edit_ledyer_order($order, $action, "customer");
+			}
+		);
+	}
+
+	private function is_metabox_save() {
+		$trace = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT|DEBUG_BACKTRACE_IGNORE_ARGS,0);
+		$valid = false;
+		foreach ($trace as $i => $t) {
+			if ($t['class'] === "WC_Meta_Box_Order_Data" && $t['function'] === "save") {
+				$valid = true;
+				break;
+			}
+		}
+		return $valid;
 	}
 
 	/**
