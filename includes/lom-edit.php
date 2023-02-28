@@ -23,7 +23,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 		return;
 	}
 
-	if ( ! in_array( $order->get_status(), apply_filters( 'lom_allowed_update_statuses', array( 'on-hold' ) ), true ) ) {
+	if ( $order->has_status( array( 'completed', 'refunded', 'cancelled' ) ) ) {
 		return;
 	}
 
