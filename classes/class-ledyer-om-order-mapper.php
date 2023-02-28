@@ -77,14 +77,32 @@ class OrderMapper {
 		);
 	}
 
+	public function woo_to_ledyer_refund_order_lines() {
+		$this->process_order_line_items(false);
+
+		$refund_order_lines = array_map(function($n) {
+			$n['quantity'] = abs($n['quantity']);
+			$n['totalAmount'] = abs($n['totalAmount']);
+			$n['totalVatAmount'] = abs($n['totalVatAmount']);
+			return $n;
+		}, $this->ledyer_order_lines);
+
+		return array(
+			'orderLines'                => $refund_order_lines,
+			'totalRefundAmount'         => abs($this->ledyer_total_order_amount),
+		);
+	}
+
 
 	/**
 	 * Process WooCommerce order items to Ledyer order lines.
 	 */
-	private function process_order_line_items() {
-		$this->order->calculate_shipping();
-		$this->order->calculate_taxes();
-		$this->order->calculate_totals();
+	private function process_order_line_items($recalc = true) {
+		if ( $recalc ) {
+			$this->order->calculate_shipping();
+			$this->order->calculate_taxes();
+			$this->order->calculate_totals();
+		}
 
 		$total = Money::of($this->order->get_total(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
 		$totalTax = Money::of($this->order->get_total_tax(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
