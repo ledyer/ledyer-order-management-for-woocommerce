@@ -45,12 +45,6 @@
 			$order->add_order_note( 'Ledyer order could not be refunded, Ledyer order is not fully captured');
 			return false;
 		}
-
-		$refund_full_order_amount = $order->get_total() == $amount;
-		if ( ! $refund_full_order_amount ) {
-			$order->add_order_note( 'Ledyer order could not be refunded, the set amount does not match the full order amount');
-			return false;
-		}
 		
 		$ledyer_order_multiple_captures = count($ledyer_order['captured']) > 1;
 		if ( $ledyer_order_multiple_captures ) {
@@ -59,7 +53,11 @@
 		}
 
 		$captured_ledger_id = $ledyer_order['captured'][0]['ledgerId'];
-		$response = $api->refund_order($ledyer_order_id, $captured_ledger_id);
+
+		$refund_order = $order->get_refunds()[0];
+		$orderMapper = new \LedyerOm\OrderMapper($refund_order);
+		$data = $orderMapper->woo_to_ledyer_refund_order_lines();
+		$response = $api->partial_refund_order($ledyer_order_id, $captured_ledger_id, $data);
 
 		if (!is_wp_error($response)) {
 			$order->add_order_note( wc_price( $amount, array( 'currency' => get_post_meta( $order_id, '_order_currency', true ) ) ) . ' refunded via Ledyer.' );
