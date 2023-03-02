@@ -55,9 +55,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 		$orderMapper = new \LedyerOm\OrderMapper($order);
 		$data = $orderMapper->woo_to_ledyer_edit_order_lines();
 		$response = $api->edit_order($ledyer_order_id, $data);
-		if (!is_wp_error($response)) {
-			$order->add_order_note( 'Ledyer order updated.' );
-		} else {
+		if (is_wp_error($response)) {
 			$errmsg = 'Ledyer order data could not be updated due to an error: ' . $response->get_error_message();
 			$order->add_order_note( $errmsg );
 		}
@@ -65,9 +63,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 		$customerMapper = new \LedyerOm\CustomerMapper($order);
 		$data = $customerMapper->woo_to_ledyer_customer();
 		$response = $api->edit_customer($ledyer_order_id, $data);
-		if (!is_wp_error($response)) {
-			$order->add_order_note( 'Ledyer customer updated.' );
-		} else {
+		if (is_wp_error($response)) {
 			$errmsg = 'Ledyer customer data could not be updated due to an error: ' . $response->get_error_message();
 			$order->add_order_note( $errmsg );
 		}
