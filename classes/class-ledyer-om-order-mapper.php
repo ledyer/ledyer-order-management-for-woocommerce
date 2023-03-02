@@ -108,6 +108,29 @@ class OrderMapper {
 		foreach ( $this->order->get_items( 'fee' ) as $order_item ) {
 			$this->ledyer_order_lines[] = $this->process_order_item( $order_item, $this->order, 'surcharge', 1 );
 		}
+
+		// TODO Add more types of gift cards when we are able to test them
+		// YITH gift cards seems to be processed as discount aka normal coupons so no need to handle them
+		// PW WooCommerce Gift Cards.
+		foreach ( $this->order->get_items( 'pw_gift_card' ) as $gift_card ) {
+			$code             = $gift_card->get_card_number();
+			$label            = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
+			$gift_card_sku    = apply_filters( 'lco_pw_gift_card_sku', esc_html__( 'giftcard', 'ledyer-checkout-for-woocommerce' ), $code );			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
+			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
+			$order_item       = array(
+				'type'                  => 'giftCard',
+				'reference'             => $gift_card_sku,
+				'description'	        => $label,
+				'quantity'              => 1,
+				'unitPrice'             => $gift_card_amount,
+				'vat'              		=> 0,
+				'totalAmount'          	=> $gift_card_amount,
+				'unitDiscountAmount' 	=> 0,
+				'totalVatAmount'      	=> 0,
+			);
+			$this->ledyer_order_lines[] = $order_item;
+		}
+
 	}
 
 	private function process_order_item( $order_item, $order, $ledyerType = null, $quantity = null) {
