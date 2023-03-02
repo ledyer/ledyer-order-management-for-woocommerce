@@ -131,11 +131,12 @@ class OrderMapper {
 		// YITH gift cards seems to be processed as discount aka normal coupons so no need to handle them
 		// PW WooCommerce Gift Cards.
 		foreach ( $this->order->get_items( 'pw_gift_card' ) as $gift_card ) {
-			$code             = $gift_card->get_card_number();
-			$label            = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
-			$gift_card_sku    = apply_filters( 'lco_pw_gift_card_sku', esc_html__( 'giftcard', 'ledyer-checkout-for-woocommerce' ), $code );			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
-			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
-			$order_item       = array(
+			$code                   = $gift_card->get_card_number();
+			$label                  = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
+			$gift_card_sku          = apply_filters( 'lco_pw_gift_card_sku', esc_html__( 'giftcard', 'ledyer-checkout-for-woocommerce' ), $code );			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
+			$gift_card_amount_minor = $this->amount_to_minor( $gift_card->get_amount(), $this->order->get_currency() );
+			$gift_card_amount       = $gift_card_amount_minor * -1;
+			$order_item = array(
 				'type'                  => 'giftCard',
 				'reference'             => $gift_card_sku,
 				'description'	        => $label,
