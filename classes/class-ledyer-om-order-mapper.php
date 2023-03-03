@@ -136,15 +136,15 @@ class OrderMapper {
 			$gift_card_sku          = apply_filters( 'lco_pw_gift_card_sku', esc_html__( 'giftcard', 'ledyer-checkout-for-woocommerce' ), $code );			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
 			$gift_card_amount_minor = $this->amount_to_minor( $gift_card->get_amount(), $this->order->get_currency() );
 			$gift_card_amount       = $gift_card_amount_minor * -1;
-			$order_item = array(
+			$order_item             = array(
 				'type'                  => 'giftCard',
 				'reference'             => $gift_card_sku,
 				'description'	        => $label,
 				'quantity'              => 1,
 				'unitPrice'             => $gift_card_amount,
-				'vat'              		=> 0,
+				'vat'                   => 0,
 				'totalAmount'          	=> $gift_card_amount,
-				'unitDiscountAmount' 	=> 0,
+				'unitDiscountAmount'    => 0,
 				'totalVatAmount'      	=> 0,
 			);
 			$this->ledyer_order_lines[] = $order_item;
