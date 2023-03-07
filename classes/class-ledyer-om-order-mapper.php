@@ -77,14 +77,32 @@ class OrderMapper {
 		);
 	}
 
+	public function woo_to_ledyer_refund_order_lines() {
+		$this->process_order_line_items(false);
+
+		$refund_order_lines = array_map(function($n) {
+			$n['quantity'] = abs($n['quantity']);
+			$n['totalAmount'] = abs($n['totalAmount']);
+			$n['totalVatAmount'] = abs($n['totalVatAmount']);
+			return $n;
+		}, $this->ledyer_order_lines);
+
+		return array(
+			'orderLines'                => $refund_order_lines,
+			'totalRefundAmount'         => abs($this->ledyer_total_order_amount),
+		);
+	}
+
 
 	/**
 	 * Process WooCommerce order items to Ledyer order lines.
 	 */
-	private function process_order_line_items() {
-		$this->order->calculate_shipping();
-		$this->order->calculate_taxes();
-		$this->order->calculate_totals();
+	private function process_order_line_items($recalc = true) {
+		if ( $recalc ) {
+			$this->order->calculate_shipping();
+			$this->order->calculate_taxes();
+			$this->order->calculate_totals();
+		}
 
 		$total = Money::of($this->order->get_total(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
 		$totalTax = Money::of($this->order->get_total_tax(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
@@ -108,6 +126,30 @@ class OrderMapper {
 		foreach ( $this->order->get_items( 'fee' ) as $order_item ) {
 			$this->ledyer_order_lines[] = $this->process_order_item( $order_item, $this->order, 'surcharge', 1 );
 		}
+
+		// TODO Add more types of gift cards when we are able to test them
+		// YITH gift cards seems to be processed as discount aka normal coupons so no need to handle them
+		// PW WooCommerce Gift Cards.
+		foreach ( $this->order->get_items( 'pw_gift_card' ) as $gift_card ) {
+			$code                   = $gift_card->get_card_number();
+			$label                  = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
+			$gift_card_sku          = apply_filters( 'lco_pw_gift_card_sku', esc_html__( 'giftcard', 'ledyer-checkout-for-woocommerce' ), $code );			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
+			$gift_card_amount_minor = $this->amount_to_minor( $gift_card->get_amount(), $this->order->get_currency() );
+			$gift_card_amount       = $gift_card_amount_minor * -1;
+			$order_item             = array(
+				'type'                  => 'giftCard',
+				'reference'             => $gift_card_sku,
+				'description'	        => $label,
+				'quantity'              => 1,
+				'unitPrice'             => $gift_card_amount,
+				'vat'                   => 0,
+				'totalAmount'          	=> $gift_card_amount,
+				'unitDiscountAmount'    => 0,
+				'totalVatAmount'      	=> 0,
+			);
+			$this->ledyer_order_lines[] = $order_item;
+		}
+
 	}
 
 	private function process_order_item( $order_item, $order, $ledyerType = null, $quantity = null) {

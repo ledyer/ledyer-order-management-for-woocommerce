@@ -41,18 +41,23 @@ class CustomerMapper {
 			'postalCode'		=> $this->order->get_billing_postcode(),
 			'city' 				=> $this->order->get_billing_city(),
 			'country'			=> $this->order->get_billing_country(),
-			'attentionName'		=> !empty( $attention_name ) ? $attentionName : "",
+			'attentionName'		=> !empty( $attentionName ) ? $attentionName : "",
 			'careOf'			=> !empty( $careOf ) ? $careOf : "",
 		);
 	}
 
 	private function process_shipping() {
+		$attentionName = get_post_meta($this->order->get_id(), '_shipping_attention_name', true);
+		$careOf = get_post_meta($this->order->get_id(), '_shipping_care_of', true);
+		
 		return array(
 			'companyName'	=> $this->order->get_shipping_company(),
 			'streetAddress'	=> $this->order->get_shipping_address_1(),
 			'postalCode'	=> $this->order->get_shipping_postcode(),
 			'city'			=> $this->order->get_shipping_city(),
 			'country'		=> $this->order->get_shipping_country(),
+			'attentionName'	=> !empty( $attentionName ) ? $attentionName : "",
+			'careOf'		=> !empty( $careOf ) ? $careOf : "",
 			'contact' => $this->process_shipping_contact(),
 		);
 	}

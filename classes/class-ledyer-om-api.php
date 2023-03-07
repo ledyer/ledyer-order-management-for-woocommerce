@@ -12,6 +12,7 @@ use LedyerOm\Requests\Order\Payment_Status;
 use LedyerOm\Requests\Order\Get_Order;
 use LedyerOm\Requests\Order\Capture_Order;
 use LedyerOm\Requests\Order\Refund_Order;
+use LedyerOm\Requests\Order\Partial_Refund_Order;
 use LedyerOm\Requests\Order\Cancel_Order;
 use LedyerOm\Requests\Order\Edit_Order;
 use LedyerOm\Requests\Order\Edit_Customer;
@@ -40,7 +41,11 @@ class API {
 	}
 
 	public function refund_order( $order_id, $ledger_id ) {
-		return ( new Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id ) ) )->request();
+		return ( new Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id) ) )->request();
+	}
+
+	public function partial_refund_order( $order_id, $ledger_id, $data ) {
+		return ( new Partial_Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id, 'data' => $data) ) )->request();
 	}
 
 	public function cancel_order( $order_id ) {
@@ -48,10 +53,10 @@ class API {
 	}
 
 	public function edit_order( $order_id, $data ) {
-		return ( new Edit_Order( array('orderId' => $order_id, 'data'    => $data ) ) )->request();
+		return ( new Edit_Order( array('orderId' => $order_id, 'data' => $data ) ) )->request();
 	}
 
 	public function edit_customer( $order_id, $data ) {
-		return ( new Edit_Customer( array('orderId' => $order_id, 'data'    => $data ) ) )->request();
+		return ( new Edit_Customer( array('orderId' => $order_id, 'data' => $data ) ) )->request();
 	}
 }

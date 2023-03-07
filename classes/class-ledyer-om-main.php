@@ -18,7 +18,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION = '1.2.0';
+	const VERSION = '1.3.0';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
@@ -97,11 +97,8 @@ class Ledyer_Order_Management_For_WooCommerce {
 
 		// Validate customer details such as shipping and billing
 		add_action(
-			'woocommerce_before_order_object_save',
+			'woocommerce_process_shop_order_meta',
 			function ($order, $action = false) {
-				if (!is_admin() || !$this->is_metabox_save()) {
-					return;
-				}
 				validate_edit_ledyer_order($order, $action, "customer");
 			}
 		);
@@ -202,6 +199,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-get-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-capture-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-refund-order.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-partial-refund-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-cancel-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-edit-order.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/requests/order/class-ledyer-om-request-edit-customer.php';

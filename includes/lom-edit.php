@@ -9,36 +9,40 @@
  * @param bool $action If this was triggered by an action.
  * @param string $syncType order or customer
  */
-function validate_edit_ledyer_order($order, $action = false, $syncType ) {
+function validate_edit_ledyer_order($order_id, $action = false, $syncType ) {
 	$options = get_option( 'lom_settings' );
 	if ( 'no' === $options['lom_auto_update']) {
 		return;
 	}
-	
+
+	$order = wc_get_order( $order_id );
+
 	if ( ! allow_editing($order) ) {
 		return;
 	}
 
 	if ("customer" === $syncType) {
-		validate_customer_field($order, 'billing_company', 0, 100);
-		validate_customer_field($order, 'billing_address_1', 0, 100);
-		validate_customer_field($order, 'billing_address_2', 0, 100);
-		validate_customer_field($order, 'billing_postcode', 0, 10);
-		validate_customer_field($order, 'billing_city', 0, 50);
-		validate_customer_field($order, 'billing_country', 0, 50);
-		// TODO careof
-		// TODO attention
-		
-		validate_customer_field($order, 'shipping_company', 0, 100);
-		validate_customer_field($order, 'shipping_address_1', 0, 100);
-		validate_customer_field($order, 'shipping_address_2', 0, 100);
-		validate_customer_field($order, 'shipping_postcode', 0, 10);
-		validate_customer_field($order, 'shipping_city', 0, 50);
-		validate_customer_field($order, 'shipping_country', 0, 50);
-		validate_customer_field($order, 'shipping_first_name', 0, 200);
-		validate_customer_field($order, 'shipping_last_name', 0, 200);
-		validate_customer_field($order, 'shipping_phone', 9, 15);
-		// TODO contact email
+		validate_customer_field($order, '_billing_company', 0, 100);
+		validate_customer_field($order, '_billing_address_1', 0, 100);
+		validate_customer_field($order, '_billing_address_2', 0, 100);
+		validate_customer_field($order, '_billing_postcode', 0, 10);
+		validate_customer_field($order, '_billing_city', 0, 50);
+		validate_customer_field($order, '_billing_country', 0, 50);
+		validate_customer_field($order, '_billing_attention_name', 0, 100);
+		validate_customer_field($order, '_billing_care_of', 0, 100);
+
+		validate_customer_field($order, '_shipping_company', 0, 100);
+		validate_customer_field($order, '_shipping_address_1', 0, 100);
+		validate_customer_field($order, '_shipping_address_2', 0, 100);
+		validate_customer_field($order, '_shipping_postcode', 0, 10);
+		validate_customer_field($order, '_shipping_city', 0, 50);
+		validate_customer_field($order, '_shipping_country', 0, 50);
+		validate_customer_field($order, '_shipping_attention_name', 0, 100);
+		validate_customer_field($order, '_shipping_care_of', 0, 100);
+		validate_customer_field($order, '_shipping_first_name', 0, 200);
+		validate_customer_field($order, '_shipping_last_name', 0, 200);
+		validate_customer_field($order, '_shipping_phone', 9, 15);
+		validate_customer_field($order, '_shipping_email', 0, 100);
 	}
 }
 	
@@ -59,7 +63,13 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 
 	$order = wc_get_order( $order_id );
 
-	if ( ! allow_editing($order) ) {
+	// Only support Ledyer orders
+	$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
+	if (! $is_ledyer_order) {
+		return;
+	}
+
+	if ( $order->has_status( array( 'completed', 'refunded', 'cancelled' ) ) ) {
 		return;
 	}
 
@@ -90,9 +100,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 		$orderMapper = new \LedyerOm\OrderMapper($order);
 		$data = $orderMapper->woo_to_ledyer_edit_order_lines();
 		$response = $api->edit_order($ledyer_order_id, $data);
-		if (!is_wp_error($response)) {
-			$order->add_order_note( 'Ledyer order updated.' );
-		} else {
+		if (is_wp_error($response)) {
 			$errmsg = 'Ledyer order data could not be updated due to an error: ' . $response->get_error_message();
 			$order->add_order_note( $errmsg );
 		}
@@ -100,9 +108,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 		$customerMapper = new \LedyerOm\CustomerMapper($order);
 		$data = $customerMapper->woo_to_ledyer_customer();
 		$response = $api->edit_customer($ledyer_order_id, $data);
-		if (!is_wp_error($response)) {
-			$order->add_order_note( 'Ledyer customer updated.' );
-		} else {
+		if (is_wp_error($response)) {
 			$errmsg = 'Ledyer customer data could not be updated due to an error: ' . $response->get_error_message();
 			$order->add_order_note( $errmsg );
 		}
@@ -110,9 +116,8 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 }
 
 function validate_customer_field($order, $fieldName, $min, $max) {
-	$changes = $order->get_changes();
-	$field = $changes[$fieldName];
-	$valid = validate_field_length($field, $min, $max);
+	$value = $_POST[$fieldName];
+	$valid = validate_field_length($value, $min, $max);
 	if (!$valid) {
 		$order->add_order_note( 'Ledyer customer data could not be updated. Invalid ' . $fieldName);
 		wp_safe_redirect( wp_get_referer() );
@@ -134,7 +139,7 @@ function allow_editing($order) {
 		return false;
 	}
 
-	if ( ! in_array( $order->get_status(), apply_filters( 'lom_allowed_update_statuses', array( 'on-hold' ) ), true ) ) {
+	if ( $order->has_status( array( 'completed', 'refunded', 'cancelled' ) ) ) {
 		return false;
 	}
 	
