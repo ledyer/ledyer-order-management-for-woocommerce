@@ -63,13 +63,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 
 	$order = wc_get_order( $order_id );
 
-	// Only support Ledyer orders
-	$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
-	if (! $is_ledyer_order) {
-		return;
-	}
-
-	if ( $order->has_status( array( 'completed', 'refunded', 'cancelled' ) ) ) {
+	if ( ! allow_editing($order) ) {
 		return;
 	}
 
