@@ -77,7 +77,7 @@ function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 
 	if ( ! $ledyer_order_id && ! get_post_meta( $order_id, '_transaction_id', true ) ) {
 		$order->add_order_note( 'Ledyer order ID is missing, Ledyer order could not be updated at this time.' );
-		return false;
+		return;
 	}
 
 	// Fetch the ledyer order
