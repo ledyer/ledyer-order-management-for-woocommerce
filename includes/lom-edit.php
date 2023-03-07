@@ -53,7 +53,7 @@ function validate_edit_ledyer_order($order_id, $action = false, $syncType ) {
  * @param int  $order_id Order ID.
  * @param bool $action If this was triggered by an action.
  * @param $api The lom api instance
- * @param string s$syncType order or customer
+ * @param string $syncType order or customer
  */
 function edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 	$options = get_option( 'lom_settings' );
