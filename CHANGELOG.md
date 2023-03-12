@@ -1,3 +1,7 @@
+## 1.4.0
+* Feat: Validation of customer billing + shipping address
+* Feat: Make custom address fields editable
+
 ## 1.3.0
 * Feat: Partial refund support
 * Fix: Adjusted order edit
