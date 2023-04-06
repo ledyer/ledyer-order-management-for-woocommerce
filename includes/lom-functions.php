@@ -7,7 +7,7 @@
 
 \defined( 'ABSPATH' ) || die();
 
-function order_placed_with_ledyer($payment_method) {
+function lom_order_placed_with_ledyer($payment_method) {
 	if ( in_array($payment_method, array('ledyer_payments', 'lco')) ) {
 		return true;
 	}
@@ -15,7 +15,7 @@ function order_placed_with_ledyer($payment_method) {
 	return false;
 }
 
-function get_first_captured($ledyer_order) {
+function lom_get_first_captured($ledyer_order) {
 	$captured = $ledyer_order['captured'];
 	return $captured[0];
 }

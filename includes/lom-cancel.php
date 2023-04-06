@@ -9,7 +9,7 @@
 	 * @param bool $action If this was triggered by an action.
 	 * @param $api The lom api instance
 	 */
-	function cancel_ledyer_order($order_id, $action = false, $api) {
+	function lom_cancel_ledyer_order($order_id, $action = false, $api) {
 		$options = get_option( 'lom_settings' );
 		// If the cancel is not enabled in lom-settings
 		if ( 'no' === $options['lom_auto_cancel']) {
@@ -19,7 +19,7 @@
 		$order = wc_get_order( $order_id );
 
 		// Only support Ledyer orders
-		$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
+		$is_ledyer_order = lom_order_placed_with_ledyer($order->get_payment_method());
 		if (! $is_ledyer_order) {
 			return;
 		}

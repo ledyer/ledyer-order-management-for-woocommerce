@@ -1,3 +1,6 @@
+## 1.4.1
+* prefixed public functions with `lom_`
+
 ## 1.4.0
 * Feat: Validation of customer billing + shipping address
 * Feat: Make custom address fields editable
