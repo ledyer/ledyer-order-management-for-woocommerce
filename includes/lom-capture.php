@@ -9,7 +9,7 @@
  * @param bool $action If this was triggered by an action.
  * @param $api The lom api instance
  */
-	function capture_ledyer_order($order_id, $action = false, $api) {
+	function lom_capture_ledyer_order($order_id, $action = false, $api) {
 		$options = get_option( 'lom_settings' );
 		// If the capture on complete is not enabled in lom-settings
 		if ( 'no' === $options['lom_auto_capture']) {
@@ -24,7 +24,7 @@
 		}
 
 		// Only support Ledyer orders
-		$is_ledyer_order = order_placed_with_ledyer($order->get_payment_method());
+		$is_ledyer_order = lom_order_placed_with_ledyer($order->get_payment_method());
 		if (! $is_ledyer_order) {
 			return;
 		}
@@ -52,7 +52,7 @@
 		}
 
 		if (in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'])) {
-			$first_captured = get_first_captured($ledyer_order);
+			$first_captured = lom_get_first_captured($ledyer_order);
 			$captured_at = $first_captured['createdAt'];
 			$formatted_capture_at = date("Y-m-d H:i:s", strtotime($captured_at));
 			$capture_id = $first_captured['ledgerId'];
@@ -71,7 +71,7 @@
 		$response = $api->capture_order($ledyer_order_id, $data);
 		
 		if (!is_wp_error($response)) {
-			$first_captured = get_first_captured($response);
+			$first_captured = lom_get_first_captured($response);
 			$capture_id = $first_captured['ledgerId'];
 
 			$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );

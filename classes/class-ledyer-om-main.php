@@ -37,23 +37,23 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_order_status_completed',
 			function ($order_id, $action = false) {
-				capture_ledyer_order($order_id, $action, $this->api);
+				lom_capture_ledyer_order($order_id, $action, $this->api);
 			}
 		);
 
-		// Listen to refund from Ledyer Checkout for Woocommerce, then call refund_ledyer_order -> lom-refund.php
+		// Listen to refund from Ledyer Checkout for Woocommerce, then call lom_refund_ledyer_order -> lom-refund.php
 		add_filter(
 			'wc_ledyer_checkout_process_refund',
 			function ($result, $order_id, $amount, $reason) {
-				return refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
 			},
 			10, 4);
 		
-		// Listen to refund from Ledyer Payments for Woocommerce, then call refund_ledyer_order -> lom-refund.php
+		// Listen to refund from Ledyer Payments for Woocommerce, then call lom_refund_ledyer_order -> lom-refund.php
 		add_filter(
 			'wc_ledyer_payments_process_refund',
 			function ($result, $order_id, $amount, $reason) {
-				return refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
 			},
 			10, 4);
 		
@@ -61,7 +61,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_order_status_cancelled',
 			function ($order_id, $action = false) {
-				cancel_ledyer_order($order_id, $action, $this->api);
+				lom_cancel_ledyer_order($order_id, $action, $this->api);
 			}
 		);
 
@@ -69,7 +69,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_saved_order_items',
 			function ($order_id, $action = false) {
-				edit_ledyer_order($order_id, $action, $this->api, "order");
+				lom_edit_ledyer_order($order_id, $action, $this->api, "order");
 			}
 		);
 
@@ -91,7 +91,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 					return;
 				}
 				$order_id = $order->get_id();
-				edit_ledyer_order($order_id, $action, $this->api, "customer");
+				lom_edit_ledyer_order($order_id, $action, $this->api, "customer");
 			}
 		);
 
@@ -99,7 +99,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_process_shop_order_meta',
 			function ($order, $action = false) {
-				validate_edit_ledyer_order($order, $action, "customer");
+				lom_validate_lom_edit_ledyer_order($order, $action, "customer");
 			}
 		);
 	}
