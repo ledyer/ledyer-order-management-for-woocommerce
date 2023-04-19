@@ -190,11 +190,18 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		$current_value = ( isset( $options['lom_status_mapping_ledyer_error'] ) ) ? $options['lom_status_mapping_ledyer_error'] : 'wc-on-hold';
 		$order_statuses = wc_get_order_statuses();
 		$order_statuses['none'] = '-';
-		echo '<select name="lom_settings[lom_status_mapping_ledyer_error]">';
-		foreach ($order_statuses as $value => $label) {
-			echo '<option value="' . $value . '" ' . selected($current_value, $value, false) . '>' . $label . '</option>';
-		}
-		echo '</select>';
+		?>
+		<select name="lom_settings[lom_status_mapping_ledyer_error]">
+		<?php
+		foreach ($order_statuses as $value => $label) :
+			$selected_attr = selected($current_value, $value, false);
+			?>
+			<option value="<?php echo esc_attr($value); ?>" <?php echo $selected_attr; ?>><?php echo esc_html($label); ?></option>
+			<?php
+		endforeach;
+		?>
+		</select>
+		<?php
 	}
 	
 	/**
