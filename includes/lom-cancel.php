@@ -34,7 +34,12 @@
 
 		// Do nothing if we don't have Ledyer order ID.
 		if ( ! $ledyer_order_id && ! get_post_meta( $order_id, '_transaction_id', true ) ) {
-			$order->update_status( 'on-hold', 'Ledyer order ID is missing, Ledyer order could not be cancelled at this time.' );
+			$errmsg = 'Ledyer order ID is missing, Ledyer order could not be cancelled at this time.';
+			if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
+				$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+			} else {
+				$order->add_order_note( $errmsg );
+			}
 			return;
 		}
 
@@ -43,7 +48,11 @@
 
 		if ( is_wp_error( $ledyer_order ) ) {
 			$errmsg = 'Ledyer order could not be cancelled due to an error: ' . $ledyer_order->get_error_message();
-			$order->update_status( 'on-hold', $errmsg );
+			if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
+				$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+			} else {
+				$order->add_order_note( $errmsg );
+			}
 			return;
 		}
 
@@ -64,5 +73,9 @@
 		}
 
 		$errmsg = 'Ledyer order could not be cancelled due to an error: ' . $response->get_error_message();
-		$order->update_status( 'on-hold', $errmsg);
+		if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
+			$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+		} else {
+			$order->add_order_note( $errmsg );
+		}
 	}

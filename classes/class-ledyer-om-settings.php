@@ -115,6 +115,13 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 			array( $this, 'field_auto_update_render' ),
 			'lom-settings',
 			'lom_settings_section'
+		);		
+		add_settings_field(
+			'lom_status_error_ledyer_woo',
+			'On fail set status',
+			array( $this, 'field_status_error_ledyer_woo_render' ),
+			'lom-settings',
+			'lom_settings_section'
 		);
 	}
 
@@ -178,6 +185,17 @@ class Ledyer_Order_Management_For_WooCommerce_Settings {
 		<?php
 	}
 
+	function field_status_error_ledyer_woo_render() {
+		$options = get_option( 'lom_settings' );
+		$current_value = ( isset( $options['lom_status_mapping_ledyer_error'] ) ) ? $options['lom_status_mapping_ledyer_error'] : 'wc-on-hold';
+		$order_statuses = wc_get_order_statuses();
+		$order_statuses['none'] = '-';
+		echo '<select name="lom_settings[lom_status_mapping_ledyer_error]">';
+		foreach ($order_statuses as $value => $label) {
+			echo '<option value="' . $value . '" ' . selected($current_value, $value, false) . '>' . $label . '</option>';
+		}
+		echo '</select>';
+	}
 	
 	/**
 	 * Adds order management to the settings pages.
