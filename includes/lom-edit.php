@@ -110,7 +110,7 @@ function lom_edit_ledyer_order($order_id, $action = false, $api, $syncType ) {
 }
 
 function lom_validate_customer_field($order, $fieldName, $min, $max) {
-	$value = $_POST[$fieldName];
+	$value = sanitize_text_field( $_POST[$fieldName] );
 	$valid = lom_validate_field_length($value, $min, $max);
 	if (!$valid) {
 		$order->add_order_note( 'Ledyer customer data could not be updated. Invalid ' . $fieldName);
