@@ -1,10 +1,11 @@
 ## 1.4.2
 
-- wp review fixes - sanitize_text_field on user input texts
+- Fix: wp review fixes - sanitize_text_field on user input texts
+- Fix: configurable error status mapping
 
 ## 1.4.1
 
-- prefixed public functions with `lom_`
+- Fix: prefixed public functions with `lom_`
 
 ## 1.4.0
 
