@@ -1,3 +1,7 @@
+## 1.4.3
+
+- Fix: Don't update woo state on cancel failures
+
 ## 1.4.2
 
 - Fix: wp review fixes - sanitize_text_field on user input texts
