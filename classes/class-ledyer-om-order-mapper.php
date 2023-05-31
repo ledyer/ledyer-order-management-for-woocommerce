@@ -141,10 +141,8 @@ class OrderMapper {
 				'reference'             => $gift_card_sku,
 				'description'	        => $label,
 				'quantity'              => 1,
-				'unitPrice'             => $gift_card_amount,
 				'vat'                   => 0,
 				'totalAmount'          	=> $gift_card_amount,
-				'unitDiscountAmount'    => 0,
 				'totalVatAmount'      	=> 0,
 			);
 			$this->ledyer_order_lines[] = $order_item;
@@ -158,8 +156,6 @@ class OrderMapper {
 			'reference'             => $this->get_item_reference( $order_item ),
 			'description'           => $this->get_item_name( $order_item ),
 			'quantity'              => $quantity ? $quantity : $this->get_item_quantity( $order_item ),
-			'unitPrice'             => $this->get_item_unit_price( $order_item, $order->get_currency()),
-			'unitDiscountAmount'    => $this->get_item_discount_amount( $order_item, $order->get_currency()),
 			'vat'                   => $this->get_item_tax_rate( $order, $order_item ),
 			'totalAmount'           => $this->get_item_total_amount( $order_item, $order->get_currency()),
 			'totalVatAmount'        => $this->get_item_tax_amount( $order_item, $order->get_currency()),
@@ -209,23 +205,6 @@ class OrderMapper {
 		}
 	}
 
-	private function get_item_unit_price( $order_line_item, $currency) {
-		if ( 'shipping' === $order_line_item->get_type() || 'fee' === $order_line_item->get_type() ) {
-			$item_price = $order_line_item->get_total() + $order_line_item->get_total_tax();
-			$item_quantity = 1;
-		} elseif ( 'coupon' === $order_line_item->get_type() ) {
-			$item_price    = $order_line_item->get_discount();
-			$item_quantity = 1;
-		} else {
-			$item_price = $order_line_item->get_subtotal() + $order_line_item->get_subtotal_tax();
-			$item_quantity = $order_line_item->get_quantity() ? $order_line_item->get_quantity() : 1;
-		}
-
-		$money = Money::of( $item_price, $currency, null, RoundingMode::HALF_UP);
-		$money = $money->dividedBy( $item_quantity, RoundingMode::HALF_UP);
-		return $money->getMinorAmount()->toInt();
-	}
-
 	public function get_item_tax_rate( $order, $order_line_item = false) {
 		if ( 'coupon' === $order_line_item->get_type() ) {
 			return 0;
@@ -253,19 +232,6 @@ class OrderMapper {
 			$item_total_amount = $order_line_item->get_total() + $order_line_item->get_total_tax();
 		}
 		return $this->amount_to_minor( $item_total_amount, $currency );
-	}
-
-	private function get_item_discount_amount( $order_line_item, $currency ) {
-		if ( $order_line_item['subtotal'] > $order_line_item['total'] ) {
-			$item_discount_amount = ( $order_line_item['subtotal'] + $order_line_item['subtotal_tax'] - $order_line_item['total'] - $order_line_item['total_tax'] );
-		} else {
-			$item_discount_amount = 0;
-		}
-
-		$money = Money::of($item_discount_amount, $currency, null, RoundingMode::HALF_UP);
-		$quantity = $this->get_item_quantity( $order_line_item);
-		$money = $money->dividedBy($quantity, RoundingMode::HALF_UP);
-		return $money->getMinorAmount()->toInt();
 	}
 
 	private function get_item_tax_amount( $order_line_item, $currency ) {
