@@ -1,3 +1,7 @@
+## 1.4.4
+
+- Fix: Change to use exclusive vat mode
+
 ## 1.4.3
 
 - Fix: Don't update woo state on cancel failures
