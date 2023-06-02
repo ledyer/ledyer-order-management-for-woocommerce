@@ -41,7 +41,7 @@ function lom_validate_lom_edit_ledyer_order($order_id, $action = false, $syncTyp
 		lom_validate_customer_field($order, '_shipping_care_of', 0, 100);
 		lom_validate_customer_field($order, '_shipping_first_name', 0, 200);
 		lom_validate_customer_field($order, '_shipping_last_name', 0, 200);
-		lom_validate_customer_field($order, '_shipping_phone', 9, 15);
+		lom_validate_customer_field($order, '_shipping_phone', 9, 30);
 		lom_validate_customer_field($order, '_shipping_email', 0, 100);
 	}
 }
