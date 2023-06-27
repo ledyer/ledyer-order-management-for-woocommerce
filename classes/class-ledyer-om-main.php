@@ -94,14 +94,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 				lom_edit_ledyer_order($order_id, $action, $this->api, "customer");
 			}
 		);
-
-		// Validate customer details such as shipping and billing
-		add_action(
-			'woocommerce_process_shop_order_meta',
-			function ($order, $action = false) {
-				lom_validate_lom_edit_ledyer_order($order, $action, "customer");
-			}
-		);
 	}
 
 	private function is_metabox_save() {
