@@ -1,3 +1,8 @@
+## 1.4.5
+
+- Fix: Make sure WordPress is installed with fixed version in Docker setup
+- Chore: Remove order meta data validation (moved to checkout plugin)
+
 ## 1.4.4
 
 - Fix: Change to use exclusive vat mode
