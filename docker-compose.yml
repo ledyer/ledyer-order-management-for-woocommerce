@@ -72,6 +72,7 @@ services:
     command: >
       /bin/sh -c '
       sleep 10;
+      wp core download --version=6.2.2;
       wp core install --url=http://localhost:8181 --title="Ledyer Checkout" --admin_user=admin --admin_password=password --admin_email=info@example.com --path=/var/www/html --skip-email;
       wp rewrite structure /%postname%/;
       wp plugin install wordpress-importer --activate;

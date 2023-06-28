@@ -18,7 +18,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION = '1.4.4';
+	const VERSION = '1.4.5';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
@@ -92,14 +92,6 @@ class Ledyer_Order_Management_For_WooCommerce {
 				}
 				$order_id = $order->get_id();
 				lom_edit_ledyer_order($order_id, $action, $this->api, "customer");
-			}
-		);
-
-		// Validate customer details such as shipping and billing
-		add_action(
-			'woocommerce_process_shop_order_meta',
-			function ($order, $action = false) {
-				lom_validate_lom_edit_ledyer_order($order, $action, "customer");
 			}
 		);
 	}
