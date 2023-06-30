@@ -33,8 +33,8 @@ class CustomerMapper {
 	}
 
 	private function process_billing() {
-		$attentionName = get_post_meta($this->order->get_id(), '_billing_attention_name', true);
-		$careOf = get_post_meta($this->order->get_id(), '_billing_care_of', true);
+		$attentionName = $_REQUEST['_billing_attention_name'];
+		$careOf = $_REQUEST['_billing_care_of'];
 		return array(
 			'companyName'		=> $this->order->get_billing_company(),
 			'streetAddress'		=> $this->order->get_billing_address_1(),
@@ -47,8 +47,8 @@ class CustomerMapper {
 	}
 
 	private function process_shipping() {
-		$attentionName = get_post_meta($this->order->get_id(), '_shipping_attention_name', true);
-		$careOf = get_post_meta($this->order->get_id(), '_shipping_care_of', true);
+		$attentionName = $_REQUEST['_shipping_attention_name'];
+		$careOf = $_REQUEST['_shipping_care_of'];
 		
 		return array(
 			'companyName'	=> $this->order->get_shipping_company(),
