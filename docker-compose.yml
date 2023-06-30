@@ -39,7 +39,7 @@ services:
         define( 'WP_ENVIRONMENT_TYPE', 'local' );
     volumes:
       - "./:/var/www/html/wp-content/plugins/ledyer-order-management-for-woocommerce"
-      - "../ledyer-checkout-for-woocommerce/:/var/www/html/wp-content/plugins/ledyer-checkout-for-woocommerce"
+      # - "../ledyer-checkout-for-woocommerce/:/var/www/html/wp-content/plugins/ledyer-checkout-for-woocommerce"
       - wpdata:/var/www/html
 
   wordpress-cron:
@@ -83,7 +83,7 @@ services:
       '
     volumes:
       - "./:/var/www/html/wp-content/plugins/ledyer-order-management-for-woocommerce"
-      - "../ledyer-checkout-for-woocommerce/:/var/www/html/wp-content/plugins/ledyer-checkout-for-woocommerce"
+      # - "../ledyer-checkout-for-woocommerce/:/var/www/html/wp-content/plugins/ledyer-checkout-for-woocommerce"
       - wpdata:/var/www/html
 
 volumes:

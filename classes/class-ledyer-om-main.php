@@ -18,7 +18,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION = '1.4.5';
+	const VERSION = '1.4.6';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
