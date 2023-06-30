@@ -75,37 +75,15 @@ class Ledyer_Order_Management_For_WooCommerce {
 
 		// Sync customer details such as shipping and billing
 		add_action(
-			'woocommerce_after_order_object_save',
-			function ($order, $action = false) {
+			'woocommerce_process_shop_order_meta',
+			function ($order_id, $action = false) {
 
-				// We need to restrict this to run only once
-				// This action is triggered multiple times by default (via tax calc etc) and with "stale" values for ex. billing, shipping.
-				// So we need to make sure we only execute woo->ledyer sync for:
-				// 1. only run for admin
-				// 2. only run when coming from meta box save
-
-				// Also we can't combine order items sync in here as it will end up in a circular lopp
-				// as the OrderMapper triggers new order save for tax calc etc.
-
-				if (!is_admin() || !$this->is_metabox_save()) {
+				if (!is_admin()) {
 					return;
 				}
-				$order_id = $order->get_id();
 				lom_edit_ledyer_order($order_id, $action, $this->api, "customer");
-			}
+			}, 55, 1 // Priority higher than 50, since that is the priority we use to save the fields after validation is done. We don't want to sync with Ledyer if local Woo validation of the fields fail.
 		);
-	}
-
-	private function is_metabox_save() {
-		$trace = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT|DEBUG_BACKTRACE_IGNORE_ARGS,0);
-		$valid = false;
-		foreach ($trace as $i => $t) {
-			if ($t['class'] === "WC_Meta_Box_Order_Data" && $t['function'] === "save") {
-				$valid = true;
-				break;
-			}
-		}
-		return $valid;
 	}
 
 	/**
