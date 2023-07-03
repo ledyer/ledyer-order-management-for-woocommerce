@@ -1,3 +1,7 @@
+## 1.4.7
+
+- fix: make sure phone and email billing fields can be updated
+
 ## 1.4.6
 
 - fix: change to woocommerce_process_shop_order_meta hook
