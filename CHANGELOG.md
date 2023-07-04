@@ -1,3 +1,13 @@
+## 1.4.7
+
+- fix: make sure phone and email billing fields can be updated
+
+## 1.4.6
+
+- fix: change to woocommerce_process_shop_order_meta hook
+- chore: remove redundant hack that prevented multiple requests from being sent
+- fix: pick order meta data from request instead of database to make sure we get the values that are to be updated.
+
 ## 1.4.5
 
 - Fix: Make sure WordPress is installed with fixed version in Docker setup
