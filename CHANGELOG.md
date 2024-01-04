@@ -1,3 +1,7 @@
+## 1.5.0
+
+- Add HPOS compatibility
+
 ## 1.4.7
 
 - fix: make sure phone and email billing fields can be updated

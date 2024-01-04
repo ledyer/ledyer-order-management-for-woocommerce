@@ -18,7 +18,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION = '1.4.7';
+	const VERSION = '1.5.0';
 	const SLUG = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
@@ -48,7 +48,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
 			},
 			10, 4);
-		
+
 		// Listen to refund from Ledyer Payments for Woocommerce, then call lom_refund_ledyer_order -> lom-refund.php
 		add_filter(
 			'wc_ledyer_payments_process_refund',
@@ -56,7 +56,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
 			},
 			10, 4);
-		
+
 		// Cancel an order -> lom-cancel.php
 		add_action(
 			'woocommerce_order_status_cancelled',
