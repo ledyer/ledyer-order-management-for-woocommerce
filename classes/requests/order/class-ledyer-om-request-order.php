@@ -19,7 +19,7 @@ abstract class Request_Order extends Request {
 	/*
 	 * Set request url for all Request_Order child classes
 	 */
-	protected function set_request_url() {
+	protected function set_request_url(): void {
 
 		$this->request_url = 'https://api.live.ledyer.com/';
 		$environment = ledyerOm()->parentSettings->get_test_environment();
@@ -34,7 +34,7 @@ abstract class Request_Order extends Request {
 				case 'local-fe':
 					$this->request_url = 'https://api.dev.ledyer.com/';
 					break;
-				default: 
+				default:
 					$this->request_url = 'https://api.sandbox.ledyer.com/';
 					break;
 			}
@@ -44,5 +44,5 @@ abstract class Request_Order extends Request {
 	/*
 	 * Set entrypoint in all Request_Order child classes
 	 */
-	abstract protected function set_url();
+	abstract protected function set_url(): void;
 }

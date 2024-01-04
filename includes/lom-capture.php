@@ -30,21 +30,23 @@
 		}
 
 		// Do nothing if Ledyer order was already captured according to the woo-order
-		if ( get_post_meta( $order_id, '_wc_ledyer_capture_id', true ) ) {
+		if ( $order->get_meta( '_wc_ledyer_capture_id', true ) ) {
 			$order->add_order_note( 'Ledyer order has already been captured.' );
+      $order->save();
 			return;
 		}
 
-		$ledyer_order_id = get_post_meta($order_id, '_wc_ledyer_order_id', true);
+		$ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true);
 
 		// Do nothing if we don't have Ledyer order ID.
-		if ( $ledyer_order_id && ! get_post_meta( $order_id, '_transaction_id', true )) {
+		if ( $ledyer_order_id && ! $order->get_meta( '_transaction_id', true )) {
 			$errmsg = 'Ledyer order ID is missing, Ledyer order could not be captured at this time.';
 			if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
 				$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
 			} else {
 				$order->add_order_note( $errmsg );
 			}
+      $order->save();
 			return;
 		}
 
@@ -58,6 +60,7 @@
 			} else {
 				$order->add_order_note( $errmsg );
 			}
+      $order->save();
 			return;
 		}
 
@@ -68,24 +71,26 @@
 			$capture_id = $first_captured['ledgerId'];
 
 			$order->add_order_note( 'Ledyer order has already been captured on ' . $formatted_capture_at );
-			update_post_meta( $order_id, '_wc_ledyer_capture_id', $capture_id );
+			$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
+      $order->save();
 			return;
 		} else if (in_array( LedyerOmOrderStatus::cancelled, $ledyer_order['status'] )) {
 			$order->add_order_note( 'Ledyer order failed to capture, the order has already been cancelled' );
+      $order->save();
 			return;
 		}
-
 
 		$orderMapper = new \LedyerOm\OrderMapper($order);
 		$data = $orderMapper->woo_to_ledyer_capture_order_lines();
 		$response = $api->capture_order($ledyer_order_id, $data);
-		
+
 		if (!is_wp_error($response)) {
 			$first_captured = lom_get_first_captured($response);
 			$capture_id = $first_captured['ledgerId'];
 
 			$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
-			update_post_meta($order_id, '_wc_ledyer_capture_id', $capture_id, true);
+			$order->update_meta_data('_wc_ledyer_capture_id', $capture_id, true);
+      $order->save();
 			return;
 		}
 
@@ -95,4 +100,5 @@
 		} else {
 			$order->add_order_note( $errmsg );
 		}
+    $order->save();
 	}

@@ -23,7 +23,7 @@ class Partial_Refund_Order extends Request_Order {
 	/*
 	 * Set entrypoint
 	 */
-	protected function set_url() {
+	protected function set_url(): void {
 		$refund_url = sprintf('v1/orders/%s/partialrefund/%s', $this->arguments['orderId'], $this->arguments['ledgerId']);
 		$this->url = $refund_url;
 
