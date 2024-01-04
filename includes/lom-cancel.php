@@ -28,7 +28,7 @@ function lom_cancel_ledyer_order($order_id, $action = false, $api) {
     // Do nothing if Ledyer order has already been cancelled
     if ($order->get_meta('_wc_ledyer_cancelled', true)) {
         $order->add_order_note('Ledyer order has already been cancelled.');
-        $order->save(); // Save the note
+        $order->save();
         return;
     }
 
@@ -38,7 +38,7 @@ function lom_cancel_ledyer_order($order_id, $action = false, $api) {
     if (!$ledyer_order_id && !$order->get_meta('_transaction_id', true)) {
         $errmsg = 'Ledyer order ID is missing, Ledyer order could not be cancelled at this time.';
         $order->add_order_note($errmsg);
-        $order->save(); // Save the note
+        $order->save();
         return;
     }
 
@@ -48,17 +48,17 @@ function lom_cancel_ledyer_order($order_id, $action = false, $api) {
     if (is_wp_error($ledyer_order)) {
         $errmsg = 'Ledyer order could not be cancelled due to an error: ' . $ledyer_order->get_error_message();
         $order->add_order_note($errmsg);
-        $order->save(); // Save the note
+        $order->save();
         return;
     }
 
     if ($ledyer_order['uncaptured'] == null) {
         $order->add_order_note('Ledyer order can not be cancelled because it has already been captured');
-        $order->save(); // Save the note
+        $order->save();
         return;
     } else if (in_array(LedyerOmOrderStatus::cancelled, $ledyer_order['status'])) {
         $order->add_order_note('Ledyer order has already been cancelled');
-        $order->save(); // Save the note
+        $order->save();
         return;
     }
 
@@ -67,12 +67,12 @@ function lom_cancel_ledyer_order($order_id, $action = false, $api) {
     if (!is_wp_error($response)) {
         $order->add_order_note('Ledyer order cancelled.');
         update_post_meta($order_id, '_wc_ledyer_cancelled', 'yes');
-        $order->save(); // Save the note
+        $order->save();
         return;
     }
 
     $errmsg = 'Ledyer order could not be cancelled due to an error: ' . $response->get_error_message();
     $order->add_order_note($errmsg);
-    $order->save(); // Save the note
+    $order->save();
 }
 

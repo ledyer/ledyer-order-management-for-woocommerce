@@ -30,10 +30,6 @@ function lom_refund_ledyer_order($result, $order_id, $amount, $reason, $api) {
         return lom_handle_wp_error($order, $ledyer_order, 'refunded');
     }
 
-    if (!lom_can_order_be_refunded($api, $ledyer_order_id, $order, $ledyer_order)) {
-        return false;
-    }
-
     $captured_ledger_id = $ledyer_order['captured'][0]['ledgerId'];
     $refund_order = $order->get_refunds()[0];
     $orderMapper = new \LedyerOm\OrderMapper($refund_order);
@@ -61,12 +57,6 @@ function lom_handle_wp_error($order, $wp_error, $action) {
     $errmsg = 'Ledyer order could not be ' . $action . ' due to an error: ' . $wp_error->get_error_message();
     lom_add_order_note_and_save($order, $errmsg);
     return false;
-}
-
-function lom_can_order_be_refunded($api, $ledyer_order_id, $order, $ledyer_order) {
-    // Additional checks for refund eligibility
-    // Add order notes and return false if not eligible
-    // Return true if eligible
 }
 
 function lom_process_successful_refund($order, $amount) {
