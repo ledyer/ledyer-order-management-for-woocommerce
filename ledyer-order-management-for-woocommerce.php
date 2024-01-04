@@ -56,7 +56,6 @@ add_action(
   }
 );
 
-
 function ledyerOm() {
 	return Ledyer_Order_Management_For_WooCommerce::instance();
 }
