@@ -18,7 +18,7 @@ function lom_refund_ledyer_order($result, $order_id, $amount, $reason, $api) {
     }
 
     // Check if the order was captured
-    if (!lom_is_order_captured($order_id)) {
+    if (!lom_is_order_captured($order)) {
         lom_add_order_note_and_save($order, 'Ledyer order has not been captured / not captured through Woocommerce and therefore cannot be refunded.');
         return false;
     }
@@ -44,7 +44,7 @@ function lom_refund_ledyer_order($result, $order_id, $amount, $reason, $api) {
     return lom_handle_wp_error($order, $response, 'refunded');
 }
 
-function lom_is_order_captured($order_id) {
+function lom_is_order_captured($order): bool {
     return $order->get_meta( '_wc_ledyer_capture_id', true) ? true : false;
 }
 
