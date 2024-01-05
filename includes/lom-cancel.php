@@ -66,7 +66,7 @@ function lom_cancel_ledyer_order($order_id, $action = false, $api) {
 
     if (!is_wp_error($response)) {
         $order->add_order_note('Ledyer order cancelled.');
-        update_post_meta($order_id, '_wc_ledyer_cancelled', 'yes');
+        $order->update_meta('_wc_ledyer_cancelled', 'yes');
         $order->save();
         return;
     }

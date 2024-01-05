@@ -45,7 +45,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_filter(
 			'wc_ledyer_checkout_process_refund',
 			function ($result, $order_id, $amount, $reason) {
-				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+				return lom_refund_ledyer_order($order_id, $amount, $this->api);
 			},
 			10, 4);
 
@@ -53,7 +53,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_filter(
 			'wc_ledyer_payments_process_refund',
 			function ($result, $order_id, $amount, $reason) {
-				return lom_refund_ledyer_order($result, $order_id, $amount, $reason, $this->api);
+				return lom_refund_ledyer_order($order_id, $amount, $this->api);
 			},
 			10, 4);
 
