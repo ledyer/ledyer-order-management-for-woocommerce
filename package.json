@@ -4,8 +4,8 @@
 	"description": "Ledyer order management for Woocommerce",
 	"main": "index.js",
 	"scripts": {
-		"format": "prettier --write **/*.php",
-		"format:check": "prettier --check **/*.php"
+		"format": "prettier --write '**/*.php'",
+		"format:check": "prettier --check '**/*.php'"
 	},
 	"author": "",
 	"license": "ISC",
