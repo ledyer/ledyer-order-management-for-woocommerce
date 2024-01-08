@@ -7,26 +7,27 @@
  */
 namespace LedyerOm;
 
-\defined( 'ABSPATH' ) || die();
+\defined("ABSPATH") || die();
 
 /**
  * Trait Singleton
  *
  * Creates Singleton class
  */
-trait Singleton {
-
+trait Singleton
+{
 	/** @var self */
 	private static $instance = null;
-	private static $settings = array();
+	private static $settings = [];
 
 	/**
 	 * Instanciate the class
 	 *
 	 * @return self
 	 */
-	public static function instance() {
-		if ( is_null( self::$instance ) ) {
+	public static function instance()
+	{
+		if (is_null(self::$instance)) {
 			self::$instance = new self();
 		}
 
@@ -38,7 +39,8 @@ trait Singleton {
 	 *
 	 * @return void
 	 */
-	private function __construct() {
+	private function __construct()
+	{
 		$this->set_settings();
 		$this->actions();
 		$this->filters();
@@ -49,7 +51,8 @@ trait Singleton {
 	 *
 	 * @return void
 	 */
-	public function actions() {
+	public function actions()
+	{
 	}
 
 	/**
@@ -57,14 +60,15 @@ trait Singleton {
 	 *
 	 * @return void
 	 */
-	public function filters() {
+	public function filters()
+	{
 	}
 	/**
 	 * Set settings
 	 *
 	 * @return void
 	 */
-	public function set_settings() {
+	public function set_settings()
+	{
 	}
-	
 }
