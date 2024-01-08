@@ -1,0 +1,16 @@
+{
+  "name": "ledyer-order-management-for-woocommerce",
+  "version": "1.0.0",
+  "description": "Ledyer order management for Woocommerce",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write **/*.php",
+    "format:check": "prettier --write **/*.php --check"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@prettier/plugin-php": "0.22.1",
+    "prettier": "3.1.1"
+  }
+}
