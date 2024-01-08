@@ -23,7 +23,7 @@ class Capture_Order extends Request_Order {
 	/*
 	 * Set entrypoint
 	 */
-	protected function set_url() {
+	protected function set_url(): void {
 		$capture_url = sprintf('v1/orders/%s', $this->arguments['orderId']) . '/capture';
 		$this->url = $capture_url;
 

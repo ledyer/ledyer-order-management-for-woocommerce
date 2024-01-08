@@ -23,7 +23,7 @@ class Edit_Customer extends Request_Order {
 	/*
 	 * Set entrypoint
 	 */
-	protected function set_url() {
+	protected function set_url(): void {
 		$edit_url = sprintf('v1/orders/%s/customer', $this->arguments['orderId']);
 		$this->url = $edit_url;
 

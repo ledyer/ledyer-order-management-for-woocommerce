@@ -23,7 +23,7 @@ class Cancel_Order extends Request_Order {
 	/*
 	 * Set entrypoint
 	 */
-	protected function set_url() {
+	protected function set_url(): void {
 		$cancel_url = sprintf('v1/orders/%s', $this->arguments['orderId']);
 		$this->url = $cancel_url;
 

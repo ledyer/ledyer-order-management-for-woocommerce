@@ -23,7 +23,7 @@ class Payment_Status extends Request_Order {
 	/*
 	 * Set entrypoint
 	 */
-	protected function set_url() {
+	protected function set_url(): void {
 		$get_payment_status_url = sprintf( 'v1/orders/%s/paymentstatus', $this->arguments['orderId'] );
 		$this->url = $get_payment_status_url;
 
