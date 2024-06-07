@@ -10,9 +10,12 @@
  * @param $api The lom api instance
  */
 function lom_capture_ledyer_order( $order_id, $action = false, $api ) {
-	$options = get_option( 'lom_settings' );
-	// If the capture on complete is not enabled in lom-settings
-	if ( 'no' === $options['lom_auto_capture'] ) {
+	$options                         = get_option( 'lom_settings', array() );
+	$auto_capture                    = $options['lom_auto_capture'] ?? 'yes';
+	$lom_status_mapping_ledyer_error = $options['lom_status_mapping_ledyer_error'] ?? 'wc-on-hold';
+
+	// If the capture on complete is not enabled in lom-settings.
+	if ( 'no' === $auto_capture ) {
 		return;
 	}
 
@@ -41,8 +44,8 @@ function lom_capture_ledyer_order( $order_id, $action = false, $api ) {
 	// Do nothing if we don't have Ledyer order ID.
 	if ( $ledyer_order_id && ! $order->get_meta( '_transaction_id', true ) ) {
 		$errmsg = 'Ledyer order ID is missing, Ledyer order could not be captured at this time.';
-		if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
-			$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
+			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
 			$order->add_order_note( $errmsg );
 		}
@@ -55,8 +58,8 @@ function lom_capture_ledyer_order( $order_id, $action = false, $api ) {
 
 	if ( is_wp_error( $ledyer_order ) ) {
 		$errmsg = 'Ledyer order could not be captured due to an error: ' . $ledyer_order->get_error_message();
-		if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
-			$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
+			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
 			$order->add_order_note( $errmsg );
 		}
@@ -95,8 +98,8 @@ function lom_capture_ledyer_order( $order_id, $action = false, $api ) {
 	}
 
 	$errmsg = 'Ledyer order could not be captured due to an error: ' . $response->get_error_message();
-	if ( 'none' !== $options['lom_status_mapping_ledyer_error'] ) {
-		$order->update_status( $options['lom_status_mapping_ledyer_error'], $errmsg );
+	if ( 'none' !== $lom_status_mapping_ledyer_error ) {
+		$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 	} else {
 		$order->add_order_note( $errmsg );
 	}
