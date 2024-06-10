@@ -4,6 +4,7 @@
 /node_modules
 /tests
 /languages/*-backup-*
+/.vscode
 .editorconfig
 .distignore
 .gitignore
@@ -26,3 +27,6 @@ README.md
 phpcs.ruleset.xml
 phpunit-docker.xml
 phpunit.xml
+phpcs.xml
+renovate.json
+wpcron.txt
