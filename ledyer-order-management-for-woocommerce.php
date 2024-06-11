@@ -5,7 +5,7 @@
  * Description: Ledyer Order Management for WooCommerce.
  * Author: Ledyer AB
  * Author URI: https://www.ledyer.com
- * Version: 1.5.0
+ * Version: 1.5.1
  * Text Domain: ledyer-order-management-for-woocommerce
  * Domain Path: /languages
  *
@@ -48,12 +48,12 @@ require_once __DIR__ . '/classes/class-ledyer-om-main.php';
 
 // Declare HPOS compatibility.
 add_action(
-  'before_woocommerce_init',
-  function () {
-    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-      \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-    }
-  }
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
 );
 
 function ledyerOm() {
