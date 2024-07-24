@@ -11,6 +11,7 @@
 Dockerfile-cron
 Dockerfile-wpdebug-php7
 Dockerfile-wpdebug-php8
+Dockerfile-php-build
 DOCKER_ENV
 docker_tag
 output.log
