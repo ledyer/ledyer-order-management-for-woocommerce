@@ -9,7 +9,7 @@
  * @param bool                     $action If this was triggered by an action.
  * @param $api The lom api instance
  */
-function lom_capture_ledyer_order( $order_id, $action = false, $api ) {
+function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 	$options                         = get_option( 'lom_settings', array() );
 	$auto_capture                    = $options['lom_auto_capture'] ?? 'yes';
 	$lom_status_mapping_ledyer_error = $options['lom_status_mapping_ledyer_error'] ?? 'wc-on-hold';
