@@ -9,7 +9,7 @@
 	 * @param bool                     $action If this was triggered by an action.
 	 * @param $api The lom api instance
 	 */
-function lom_cancel_ledyer_order( $order_id, $action = false, $api ) {
+function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 	$options = get_option( 'lom_settings' );
 
 	// If the cancel is not enabled in lom-settings
