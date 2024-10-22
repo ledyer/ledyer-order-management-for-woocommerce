@@ -10,7 +10,7 @@
  * @param $api The lom api instance
  * @param string $syncType order or customer
  */
-function lom_edit_ledyer_order($order_id, $action = false, $api, $syncType) {
+function lom_edit_ledyer_order($order_id, $api, $syncType, $action = false) {
     $options = get_option('lom_settings');
     if ('no' === $options['lom_auto_update']) {
         return;

@@ -17,7 +17,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 	public $parentSettings;
 	public $api;
 
-	const VERSION  = '1.5.1';
+	const VERSION  = '1.5.2';
 	const SLUG     = 'ledyer-order-management-for-woocommerce';
 	const SETTINGS = 'ledyer_order_management_for_woocommerce_settings';
 
@@ -37,7 +37,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_order_status_completed',
 			function ( $order_id, $action = false ) {
-				lom_capture_ledyer_order( $order_id, $action, $this->api );
+				lom_capture_ledyer_order( $order_id, $this->api, $action );
 			}
 		);
 
@@ -65,7 +65,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_order_status_cancelled',
 			function ( $order_id, $action = false ) {
-				lom_cancel_ledyer_order( $order_id, $action, $this->api );
+				lom_cancel_ledyer_order( $order_id, $this->api, $action );
 			}
 		);
 
@@ -73,7 +73,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action(
 			'woocommerce_saved_order_items',
 			function ( $order_id, $action = false ) {
-				lom_edit_ledyer_order( $order_id, $action, $this->api, 'order' );
+				lom_edit_ledyer_order( $order_id, $this->api, 'order', $action );
 			}
 		);
 
@@ -85,7 +85,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 				if ( ! is_admin() ) {
 					return;
 				}
-				lom_edit_ledyer_order( $order_id, $action, $this->api, 'customer' );
+				lom_edit_ledyer_order( $order_id, $this->api, 'customer', $action );
 			},
 			55,
 			1 // Priority higher than 50, since that is the priority we use to save the fields after validation is done. We don't want to sync with Ledyer if local Woo validation of the fields fail.
