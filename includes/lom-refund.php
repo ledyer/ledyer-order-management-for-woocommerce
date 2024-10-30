@@ -75,4 +75,5 @@ function _lom_process_successful_refund( $order, $amount ) {
 	_lom_add_order_note_and_save( $order, $formatted_amount . ' refunded via Ledyer.' );
 	$order->update_meta_data( '_wc_ledyer_capture_id', false );
 	$order->save();
+	return true;
 }
