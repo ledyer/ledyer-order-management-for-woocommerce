@@ -30,8 +30,8 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
 
 		// Add refunds support to Ledyer Payments and Ledyer Checkout gateways.
-		add_action( 'wc_ledyer_payments_supports', array( $this, 'add_gateway_support' ) );
 		add_action( 'lco_wc_supports', array( $this, 'add_gateway_support' ) );
+		add_action( 'ledyer_payments_supports', array( $this, 'add_gateway_support' ) );
 
 		// Capture an order -> lom-capture.php
 		add_action(
