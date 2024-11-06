@@ -53,7 +53,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 
 		// Listen to refund from Ledyer Payments for Woocommerce, then call lom_refund_ledyer_order -> lom-refund.php
 		add_filter(
-			'wc_ledyer_payments_process_refund',
+			'ledyer_payments_process_refund',
 			function ( $result, $order_id, $amount, $reason ) {
 				return lom_refund_ledyer_order( $order_id, $amount, $this->api );
 			},
