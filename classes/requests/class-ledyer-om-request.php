@@ -74,14 +74,15 @@ abstract class Request {
 	 * Requests Class constructor.
 	 *
 	 * @param array $arguments Request arguments.
+	 * @param int   $order_id The WC order ID.
 	 */
-	public function __construct( $arguments = array() ) {
+	public function __construct( $arguments, $order_id ) {
+		$this->order = wc_get_order( $order_id );
+		$this->load_settings( $this->order->get_payment_method() );
+
 		$this->arguments    = $arguments;
 		$this->access_token = $this->token();
 		$this->set_request_url();
-
-		$this->order = wc_get_order( $this->arguments['orderId'] );
-		$this->load_settings( $this->order->get_payment_method() );
 	}
 
 	/**
