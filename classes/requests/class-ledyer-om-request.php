@@ -20,38 +20,44 @@ abstract class Request {
 
 	/**
 	 * Request arguments
+	 *
 	 * @var array|mixed
 	 */
 	protected $arguments;
 	/**
 	 * Ledyer settings
+	 *
 	 * @var array
 	 */
 	protected $settings;
 	/**
 	 * Request method
+	 *
 	 * @var string
 	 */
 	protected $method = 'POST';
 	/**
 	 * Request endpoint
+	 *
 	 * @var string
 	 */
 	protected $url = '';
 	/**
 	 * Merchant Bearer token
+	 *
 	 * @var string
 	 */
 	private $access_token;
 	/**
 	 * Request entrypoint
+	 *
 	 * @var string
 	 */
 	protected $request_url;
 	/*
 	 * Requests Class constructor.
 	 */
-	public function __construct( $arguments = [] ) {
+	public function __construct( $arguments = array() ) {
 		$this->arguments    = $arguments;
 		$this->access_token = $this->token();
 		$this->set_request_url();
@@ -59,6 +65,7 @@ abstract class Request {
 
 	/**
 	 * Sets request endpoint
+	 *
 	 * @return mixed
 	 */
 	abstract protected function set_request_url();
@@ -66,6 +73,7 @@ abstract class Request {
 	/**
 	 * Save merchant's bearer token in transient.
 	 * Transient 'ledyer_token' expires in 3600s.
+	 *
 	 * @return mixed|string
 	 */
 	private function token() {
@@ -79,7 +87,7 @@ abstract class Request {
 		$environment = ledyerOm()->parentSettings->get_test_environment();
 
 		if ( $this->is_test() ) {
-			switch ($environment) {
+			switch ( $environment ) {
 				case 'local':
 					$api_auth_base = 'http://host.docker.internal:9001/';
 					break;
@@ -87,25 +95,28 @@ abstract class Request {
 				case 'local-fe':
 					$api_auth_base = 'https://auth.dev.ledyer.com/';
 					break;
-				default: 
+				default:
 					$api_auth_base = 'https://auth.sandbox.ledyer.com/';
 					break;
 			}
 		}
 
-		$client = new \WP_Http();
+		$client             = new \WP_Http();
 		$client_credentials = ledyerOm()->credentials->get_client_credentials();
 
-		$headers = [
+		$headers = array(
 			'Authorization' => 'Basic ' . base64_encode( $client_credentials['client_id'] . ':' . $client_credentials['client_secret'] ),
-		];
+		);
 
-		$response = $client->post( $api_auth_base . 'oauth/token?grant_type=client_credentials', [
-			'headers' => $headers,
-			'timeout' => 60
-		] );
+		$response = $client->post(
+			$api_auth_base . 'oauth/token?grant_type=client_credentials',
+			array(
+				'headers' => $headers,
+				'timeout' => 60,
+			)
+		);
 
-		$body = $this->process_response( $response, [ 'grant_type' => 'client_credentials' ], $api_auth_base . 'oauth/token' );
+		$body = $this->process_response( $response, array( 'grant_type' => 'client_credentials' ), $api_auth_base . 'oauth/token' );
 
 		$is_wp_error = is_object( $body ) && false !== stripos( get_class( $body ), 'WP_Error' );
 
@@ -120,29 +131,30 @@ abstract class Request {
 
 	/**
 	 * Make request.
+	 *
 	 * @return mixed|\WP_Error
 	 */
 	public function request() {
-		$url  = $this->get_request_url();
-		$args = $this->get_request_args();
-		$headers = [
+		$url             = $this->get_request_url();
+		$args            = $this->get_request_args();
+		$headers         = array(
 			'Idempotency-Key' => wp_generate_uuid4(),
-		];
-		$args['headers'] = array_merge($args['headers'], $headers);
-		return $this->do_request($url, $args);
+		);
+		$args['headers'] = array_merge( $args['headers'], $headers );
+		return $this->do_request( $url, $args );
 	}
 
 	/** internal retry helper with exponential backoff */
-	protected function do_request($url, $args, $maxRetries = 4, $delay = 0.5, $exp = 2) {
+	protected function do_request( $url, $args, $max_retries = 4, $delay = 0.5, $exp = 2 ) {
 		$response = wp_remote_request( $url, $args );
-		$parsed = $this->process_response( $response, $args, $url );
+		$parsed   = $this->process_response( $response, $args, $url );
 		if ( is_wp_error( $parsed ) ) {
 			$http_response_code = wp_remote_retrieve_response_code( $response );
-			// retry connection, timeout errors etc + all http 500 and above
-			$retry = is_string($http_response_code) || $http_response_code > 499;
-			if ($retry && $maxRetries > 0) {
-				usleep($delay * 1E6);
-				return $this->do_request($url, $args, $maxRetries - 1, $delay * $exp, $exp);
+			// retry connection, timeout errors etc + all http 500 and above.
+			$retry = is_string( $http_response_code ) || $http_response_code > 499;
+			if ( $retry && $max_retries > 0 ) {
+				usleep( $delay * 1E6 );
+				return $this->do_request( $url, $args, $max_retries - 1, $delay * $exp, $exp );
 			}
 			return $parsed;
 		}
@@ -151,6 +163,7 @@ abstract class Request {
 
 	/**
 	 * Create request url.
+	 *
 	 * @return string
 	 */
 	protected function get_request_url() {
@@ -162,14 +175,15 @@ abstract class Request {
 
 	/**
 	 * Create request args.
+	 *
 	 * @return array
 	 */
 	protected function get_request_args() {
-		$request_args = [
+		$request_args = array(
 			'headers' => $this->get_request_headers(),
 			'method'  => $this->method,
 			'timeout' => apply_filters( 'ledyer_request_timeout', 10 ),
-		];
+		);
 
 		if ( 'POST' === $this->method && $this->arguments['data'] ) {
 			$request_args['body'] = json_encode( $this->arguments['data'] );
@@ -180,17 +194,19 @@ abstract class Request {
 
 	/**
 	 * Create request headers.
+	 *
 	 * @return array
 	 */
 	protected function get_request_headers() {
-		return [
+		return array(
 			'Authorization' => sprintf( 'Bearer %s', $this->token() ),
-			'Content-Type' => 'application/json',
-		];
+			'Content-Type'  => 'application/json',
+		);
 	}
 
 	/**
 	 * Check if test env is enabled.
+	 *
 	 * @return bool
 	 */
 	protected function is_test() {
@@ -200,6 +216,7 @@ abstract class Request {
 	/**
 	 * Process response. Return response body or error.
 	 * Log errors.
+	 *
 	 * @param $response
 	 * @param $request_args
 	 * @param $request_url
