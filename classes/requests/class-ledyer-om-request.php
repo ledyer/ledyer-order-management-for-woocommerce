@@ -6,7 +6,7 @@
  */
 namespace LedyerOm\Requests;
 
-use LedyerOm\Credentials;
+use LedyerOm\Gateway_Settings;
 use LedyerOm\Logger;
 
 defined( 'ABSPATH' ) || exit();
@@ -54,13 +54,43 @@ abstract class Request {
 	 * @var string
 	 */
 	protected $request_url;
-	/*
+
+
+	/**
+	 * The WC order.
+	 *
+	 * @var WC_Order
+	 */
+	protected $order;
+
+	/**
+	 * Gateway settings.
+	 *
+	 * @var Gateway_Settings
+	 */
+	protected $gateway_settings;
+
+	/**
 	 * Requests Class constructor.
+	 *
+	 * @param array $arguments Request arguments.
 	 */
 	public function __construct( $arguments = array() ) {
 		$this->arguments    = $arguments;
 		$this->access_token = $this->token();
 		$this->set_request_url();
+
+		$this->order = wc_get_order( $this->arguments['orderId'] );
+		$this->load_settings( $this->order->get_payment_method() );
+	}
+
+	/**
+	 * Load the gateway settings.
+	 *
+	 * @param string $gateway The gateway to get settings for. Either 'lco' or 'ledyer_payments'. Defaults to the latter.
+	 */
+	private function load_settings( $gateway ) {
+		$this->gateway_settings = new Gateway_Settings( $gateway );
 	}
 
 	/**
@@ -77,16 +107,15 @@ abstract class Request {
 	 * @return mixed|string
 	 */
 	private function token() {
-
 		if ( get_transient( 'ledyer_token' ) ) {
 			return get_transient( 'ledyer_token' );
 		}
 
 		$api_auth_base = 'https://auth.live.ledyer.com/';
 
-		$environment = ledyerOm()->parentSettings->get_test_environment();
+		$environment = $this->gateway_settings->is_test_environment();
 
-		if ( $this->is_test() ) {
+		if ( $this->gateway_settings->is_test_mode() ) {
 			switch ( $environment ) {
 				case 'local':
 					$api_auth_base = 'http://host.docker.internal:9001/';
@@ -102,7 +131,7 @@ abstract class Request {
 		}
 
 		$client             = new \WP_Http();
-		$client_credentials = ledyerOm()->credentials->get_client_credentials();
+		$client_credentials = $this->gateway_settings->get_client_credentials();
 
 		$headers = array(
 			'Authorization' => 'Basic ' . base64_encode( $client_credentials['client_id'] . ':' . $client_credentials['client_secret'] ),
@@ -210,7 +239,7 @@ abstract class Request {
 	 * @return bool
 	 */
 	protected function is_test() {
-		return 'yes' === ledyerOm()->parentSettings->get_is_test_mode();
+		return $this->gateway_settings->is_test_mode();
 	}
 
 	/**
@@ -228,7 +257,7 @@ abstract class Request {
 
 		$log = Logger::format_log( '', 'POST', 'Debugger', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
 
-		Logger::log( $log );
+		Logger::log( $log, $this->gateway_settings->is_logging_enabled() );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

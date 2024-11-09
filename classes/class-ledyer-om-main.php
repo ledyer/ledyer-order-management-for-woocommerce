@@ -161,6 +161,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-credentials.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-gateway-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-order-mapper.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-customer-mapper.php';
