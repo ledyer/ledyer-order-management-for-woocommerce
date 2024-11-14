@@ -30,8 +30,8 @@ class Ledyer_Order_Management_For_WooCommerce {
 		add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
 
 		// Add refunds support to Ledyer Payments and Ledyer Checkout gateways.
-		add_action( 'wc_ledyer_payments_supports', array( $this, 'add_gateway_support' ) );
 		add_action( 'lco_wc_supports', array( $this, 'add_gateway_support' ) );
+		add_action( 'ledyer_payments_supports', array( $this, 'add_gateway_support' ) );
 
 		// Capture an order -> lom-capture.php
 		add_action(
@@ -53,7 +53,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 
 		// Listen to refund from Ledyer Payments for Woocommerce, then call lom_refund_ledyer_order -> lom-refund.php
 		add_filter(
-			'wc_ledyer_payments_process_refund',
+			'ledyer_payments_process_refund',
 			function ( $result, $order_id, $amount, $reason ) {
 				return lom_refund_ledyer_order( $order_id, $amount, $this->api );
 			},
@@ -161,6 +161,7 @@ class Ledyer_Order_Management_For_WooCommerce {
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-credentials.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-parent-settings.php';
+		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-gateway-settings.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-logger.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-order-mapper.php';
 		include_once LOM_WC_PLUGIN_PATH . '/classes/class-ledyer-om-customer-mapper.php';

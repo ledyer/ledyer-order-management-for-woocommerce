@@ -23,40 +23,138 @@ use LedyerOm\Requests\Order\Edit_Customer;
  * Class that has functions for the ledyer communication.
  */
 class API {
+
 	/**
-	 * @param $order_id
+	 * Get the payment status of an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
 	 *
 	 * @return mixed|\WP_Error
 	 */
-	public function get_payment_status( $order_id ) {
-		return ( new Payment_Status( array( 'orderId' => $order_id ) ) )->request();
+	public function get_payment_status( $ledyer_order_id ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Payment_Status( array( 'orderId' => $ledyer_order_id ), $order_id ) )->request();
 	}
 
-	public function get_order( $order_id ) {
-		return ( new Get_Order( array( 'orderId' => $order_id ) ) )->request();
-	}
-	
-	public function capture_order( $order_id, $data ) {
-		return ( new Capture_Order( array( 'orderId' => $order_id, 'data' => $data ) ) )->request();
-	}
-
-	public function refund_order( $order_id, $ledger_id ) {
-		return ( new Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id) ) )->request();
-	}
-
-	public function partial_refund_order( $order_id, $ledger_id, $data ) {
-		return ( new Partial_Refund_Order( array( 'orderId' => $order_id, 'ledgerId' => $ledger_id, 'data' => $data) ) )->request();
+	/**
+	 * Get the order details.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function get_order( $ledyer_order_id ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Get_Order( array( 'orderId' => $ledyer_order_id ), $order_id ) )->request();
 	}
 
-	public function cancel_order( $order_id ) {
-		return ( new Cancel_Order( array( 'orderId' => $order_id ) ) )->request();
+	/**
+	 * Capture an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 * @param array  $data The data to send.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function capture_order( $ledyer_order_id, $data ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Capture_Order(
+			array(
+				'orderId' => $ledyer_order_id,
+				'data'    => $data,
+			),
+			$order_id
+		) )->request();
 	}
 
-	public function edit_order( $order_id, $data ) {
-		return ( new Edit_Order( array('orderId' => $order_id, 'data' => $data ) ) )->request();
+
+	/**
+	 * Refund an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 * @param string $ledger_id The ledger id.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function refund_order( $ledyer_order_id, $ledger_id ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Refund_Order(
+			array(
+				'orderId'  => $ledyer_order_id,
+				'ledgerId' => $ledger_id,
+			),
+			$order_id
+		) )->request();
 	}
 
-	public function edit_customer( $order_id, $data ) {
-		return ( new Edit_Customer( array('orderId' => $order_id, 'data' => $data ) ) )->request();
+	/**
+	 * Partial refund an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 * @param string $ledger_id The ledger id.
+	 * @param array  $data The data to send.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function partial_refund_order( $ledyer_order_id, $ledger_id, $data ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Partial_Refund_Order(
+			array(
+				'orderId'  => $ledyer_order_id,
+				'ledgerId' => $ledger_id,
+				'data'     => $data,
+			),
+			$order_id
+		) )->request();
+	}
+
+	/**
+	 * Cancel an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function cancel_order( $ledyer_order_id ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Cancel_Order( array( 'orderId' => $ledyer_order_id ), $order_id ) )->request();
+	}
+
+	/**
+	 * Edit an order.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 * @param array  $data The data to send.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function edit_order( $ledyer_order_id, $data ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Edit_Order(
+			array(
+				'orderId' => $ledyer_order_id,
+				'data'    => $data,
+			),
+			$order_id
+		) )->request();
+	}
+
+	/**
+	 * Edit a customer.
+	 *
+	 * @param string $ledyer_order_id The Ledyer order id.
+	 * @param array  $data The data to send.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	public function edit_customer( $ledyer_order_id, $data ) {
+		$order_id = lom_get_order_id_by_ledyer_order_id( $ledyer_order_id );
+		return ( new Edit_Customer(
+			array(
+				'orderId' => $ledyer_order_id,
+				'data'    => $data,
+			),
+			$order_id
+		) )->request();
 	}
 }
