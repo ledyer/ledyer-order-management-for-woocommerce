@@ -83,7 +83,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
-	if ( ! $order->get_meta( '_ready_for_capture', true ) ) {
+	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) ) {
 		$order->add_order_note( 'Ledyer order is not ready for capture' );
 		$order->save();
 		return;
