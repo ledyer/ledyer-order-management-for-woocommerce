@@ -22,11 +22,11 @@ abstract class Request_Order extends Request {
 	protected function set_request_url(): void {
 
 		$this->request_url = 'https://api.live.ledyer.com/';
-		$environment = ledyerOm()->parentSettings->get_test_environment();
+		$environment       = $this->gateway_settings->is_test_environment();
 
 		if ( parent::is_test() ) {
 
-			switch ($environment) {
+			switch ( $environment ) {
 				case 'local':
 					$this->request_url = 'http://host.docker.internal:8000/';
 					break;
