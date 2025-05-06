@@ -104,12 +104,13 @@ class OrderMapper {
 			$this->order->calculate_totals();
 		}
 
-		$total = Money::of($this->order->get_total(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
-		$totalTax = Money::of($this->order->get_total_tax(), $this->order->get_currency(), null, RoundingMode::HALF_UP);
-		$totalExclTax = $total->minus($totalTax);
-		$this->ledyer_total_order_amount = $total->getMinorAmount()->toInt();
-		$this->ledyer_total_order_vat_amount  = $totalTax->getMinorAmount()->toInt();
-		$this->ledyer_total_order_amount_excl_vat  = $totalExclTax->getMinorAmount()->toInt();
+		$total        = Money::of( $this->order->get_total(), $this->order->get_currency(), null, 4 );
+		$totalTax     = Money::of( $this->order->get_total_tax(), $this->order->get_currency(), null, 4 );
+		$totalExclTax = $total->minus( $totalTax );
+
+		$this->ledyer_total_order_amount          = $total->getMinorAmount()->toInt();
+		$this->ledyer_total_order_vat_amount      = $totalTax->getMinorAmount()->toInt();
+		$this->ledyer_total_order_amount_excl_vat = $totalExclTax->getMinorAmount()->toInt();
 
 		foreach ( $this->order->get_items() as $order_item ) {
 			$ledyer_item = $this->process_order_item( $order_item, $this->order );
