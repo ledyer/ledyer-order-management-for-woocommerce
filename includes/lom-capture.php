@@ -83,17 +83,19 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
-	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) ) {
-		$errmsg = 'Ledyer order is not ready for capture.';
-
-		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
-			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
-		} else {
-			$order->add_order_note( $errmsg );
-		}
-		$order->save();
-		return;
-	}
+  // comment out for now as it's not working, even after the order is ready for capture
+  // the error message is shown
+	// if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) ) {
+	// 	$errmsg = 'Ledyer order is not ready for capture.';
+	//
+	// 	if ( 'none' !== $lom_status_mapping_ledyer_error ) {
+	// 		$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
+	// 	} else {
+	// 		$order->add_order_note( $errmsg );
+	// 	}
+	// 	$order->save();
+	// 	return;
+	// }
 
 	$orderMapper = new \LedyerOm\OrderMapper( $order );
 	$data        = $orderMapper->woo_to_ledyer_capture_order_lines();
