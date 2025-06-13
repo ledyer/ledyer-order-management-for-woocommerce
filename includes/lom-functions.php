@@ -57,7 +57,7 @@ function lom_get_order_id_by_ledyer_order_id( $ledyer_order_id ) {
  *
  * @return float|int Returns the numeric value of the input, or the default value if the input is not numeric and cannot be converted.
  */
-function ledyer_ensure_numeric( $value, $default = 0 ) {
+function ledyer_om_ensure_numeric( $value, $default = 0 ) {
 	if ( is_numeric( $value ) ) {
 		return floatval( $value );
 	}

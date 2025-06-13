@@ -225,11 +225,11 @@ class OrderMapper {
 
 	private function get_item_total_amount( $order_line_item, $currency ) {
 		if ( 'shipping' === $order_line_item->get_type() || 'fee' === $order_line_item->get_type() ) {
-			$item_total_amount = ledyer_ensure_numeric( $order_line_item->get_total() ) + $order_line_item->get_total_tax();
+			$item_total_amount = ledyer_om_ensure_numeric( $order_line_item->get_total() ) + $order_line_item->get_total_tax();
 		} elseif ( 'coupon' === $order_line_item->get_type() ) {
 			$item_total_amount = $order_line_item->get_discount();
 		} else {
-			$item_total_amount = ledyer_ensure_numeric( $order_line_item->get_total() ) + $order_line_item->get_total_tax();
+			$item_total_amount = ledyer_om_ensure_numeric( $order_line_item->get_total() ) + $order_line_item->get_total_tax();
 		}
 		return $this->amount_to_minor( $item_total_amount, $currency );
 	}
