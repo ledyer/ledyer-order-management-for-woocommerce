@@ -11,7 +11,7 @@
  * @param string $syncType order or customer
  */
 function lom_edit_ledyer_order($order_id, $api, $syncType, $action = false) {
-    $options = get_option('lom_settings');
+    $options = get_option( 'lom_settings', array( 'lom_auto_update' => 'yes' ) );
     if ('no' === $options['lom_auto_update']) {
         return;
     }
@@ -24,7 +24,7 @@ function lom_edit_ledyer_order($order_id, $api, $syncType, $action = false) {
 
     $ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true);
 
-    if (!$ledyer_order_id && !$order->get_meta('_transaction_id', true)) {
+    if ( ! $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
         $order->add_order_note('Ledyer order ID is missing, Ledyer order could not be updated at this time.');
         $order->save();
         return;
@@ -32,7 +32,7 @@ function lom_edit_ledyer_order($order_id, $api, $syncType, $action = false) {
 
     $ledyer_order = $api->get_order($ledyer_order_id);
 
-    if (is_wp_error($ledyer_order)) {
+    if ( is_wp_error($ledyer_order) ) {
         $errmsg = 'Ledyer order could not be updated due to an error: ' . $ledyer_order->get_error_message();
         $order->add_order_note($errmsg);
         $order->save();
