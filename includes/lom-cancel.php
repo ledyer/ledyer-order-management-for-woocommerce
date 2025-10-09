@@ -10,7 +10,7 @@
 	 * @param $api The lom api instance
 	 */
 function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
-	$options = get_option( 'lom_settings' );
+	$options = get_option( 'lom_settings', array( 'lom_auto_cancel' => 'yes' ) );
 
 	// If the cancel is not enabled in lom-settings
 	if ( 'no' === $options['lom_auto_cancel'] ) {
@@ -35,7 +35,7 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 	$ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true );
 
 	// Do nothing if we don't have Ledyer order ID.
-	if ( ! $ledyer_order_id && ! $order->get_meta( '_transaction_id', true ) ) {
+	if ( ! $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
 		$errmsg = 'Ledyer order ID is missing, Ledyer order could not be cancelled at this time.';
 		$order->add_order_note( $errmsg );
 		$order->save();
