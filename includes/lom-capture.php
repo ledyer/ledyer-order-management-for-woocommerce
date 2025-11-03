@@ -83,19 +83,17 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
-	// comment out for now as it's not working, even after the order is ready for capture
-	// the error message is shown
-	// if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) ) {
-	// $errmsg = 'Ledyer order is not ready for capture.';
-	//
-	// if ( 'none' !== $lom_status_mapping_ledyer_error ) {
-	// $order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
-	// } else {
-	// $order->add_order_note( $errmsg );
-	// }
-	// $order->save();
-	// return;
-	// }
+	// Check if the order is ready for capture or not. If its not, then either update the order status or print a notice and return.
+	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) && ! lom_ledyer_order_can_be_captured( $ledyer_order ) ) {
+		$errmsg = 'Ledyer order is not ready for capture.';
+		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
+			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
+		} else {
+			$order->add_order_note( $errmsg );
+		}
+		$order->save();
+		return;
+	}
 
 	$orderMapper = new \LedyerOm\OrderMapper( $order );
 	$data        = $orderMapper->woo_to_ledyer_capture_order_lines();
@@ -118,4 +116,28 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		$order->add_order_note( $errmsg );
 	}
 	$order->save();
+}
+
+/**
+ * Test to see if the order from Ledyer can be captured or not.
+ *
+ * @param array $ledyer_order The Ledyer order.
+ * @return bool True if the order can be captured, false otherwise.
+ */
+function lom_ledyer_order_can_be_captured( $ledyer_order ) {
+	$uncaptured_data = $ledyer_order['uncaptured'] ?? null;
+
+	if ( empty( $uncaptured_data ) ) {
+		return false;
+	}
+
+	// If the capture type exists in the 'availableActions', then the order can still be captured.
+	$can_be_captured = array_filter(
+		$uncaptured_data['availableActions'],
+		function ( $action ) {
+			return $action['type'] === 'capture';
+		}
+	);
+
+	return ! empty( $can_be_captured );
 }
