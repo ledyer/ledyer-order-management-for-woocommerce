@@ -85,7 +85,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 
 	// Check if the order is ready for capture or not. If its not, then either update the order status or print a notice and return.
 	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) && ! lom_ledyer_order_can_be_captured( $ledyer_order ) ) {
-		$errmsg = 'Ledyer order is not ready for capture.';
+		$errmsg = __( 'Ledyer order is not ready for capture.', 'ledyer-order-management-for-woocommerce');
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
