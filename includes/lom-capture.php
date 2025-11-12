@@ -132,12 +132,13 @@ function lom_ledyer_order_can_be_captured( $ledyer_order ) {
 	}
 
 	// If the capture type exists in the 'availableActions', then the order can still be captured.
-	$can_be_captured = array_filter(
-		$uncaptured_data['availableActions'],
-		function ( $action ) {
-			return $action['type'] === 'capture';
+	$can_be_captured = false;
+	foreach( $uncaptured_data['availableActions'] as $action ) {
+		if ( $action['type'] === 'capture' ) {
+			$can_be_captured = true;
+			break;
 		}
-	);
+	}
 
 	return ! empty( $can_be_captured );
 }
