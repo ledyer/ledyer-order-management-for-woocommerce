@@ -106,7 +106,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		$capture_id     = $first_captured['ledgerId'];
 
 		$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
-		$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id, true );
+		$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
 		$order->save();
 		return;
 	}
