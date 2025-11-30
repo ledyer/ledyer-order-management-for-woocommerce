@@ -5,8 +5,8 @@
 /**
  * Captures a Ledyer order.
  *
- * @param int                      $order_id Order ID.
- * @param bool                     $action If this was triggered by an action.
+ * @param int  $order_id Order ID.
+ * @param bool $action If this was triggered by an action.
  * @param $api The lom api instance
  */
 function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
@@ -67,7 +67,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
-	if ( in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'] ) ) {
+	if ( in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'], true ) ) {
 		$first_captured       = lom_get_first_captured( $ledyer_order );
 		$captured_at          = $first_captured['createdAt'];
 		$formatted_capture_at = date( 'Y-m-d H:i:s', strtotime( $captured_at ) );
@@ -77,7 +77,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
 		$order->save();
 		return;
-	} elseif ( in_array( LedyerOmOrderStatus::cancelled, $ledyer_order['status'] ) ) {
+	} elseif ( in_array( LedyerOmOrderStatus::cancelled, $ledyer_order['status'], true ) ) {
 		$order->add_order_note( 'Ledyer order failed to capture, the order has already been cancelled' );
 		$order->save();
 		return;
