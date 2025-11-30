@@ -6,12 +6,15 @@ Requires at least: 4.0
 Tested up to: 6.8.3
 Requires PHP: 7.4
 WC requires at least: 5.0.0
-WC tested up to: 10.2.2
-Stable tag: 1.5.5
+WC tested up to: 10.3.5
+Stable tag: 1.5.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Changelog ==
+= 2025.11.24    - version 1.5.6 =
+* Enhancement   - Ensure an order can be captured before attempting a capture when the WooCommerce order is set to completed.
+
 = 2025.10.09    - version 1.5.5 =
 * Fix           - Implemented a numeric conversion helper for shipping prices to ensure they are always numeric, preventing potential fatal errors during order management when shipping option prices are returned as strings.
 * Fix           - Addressed various deprecation warnings from PHP 8.2 and 8.3.
