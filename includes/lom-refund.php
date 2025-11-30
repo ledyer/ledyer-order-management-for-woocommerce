@@ -56,7 +56,7 @@ function _lom_attempt_refund( $order, $amount, $api ) {
 }
 
 function _lom_is_order_captured( $order ): bool {
-	return $order->get_meta( '_wc_ledyer_capture_id', true ) ? true : false;
+	return ! empty( $order->get_meta( '_wc_ledyer_capture_id' ) );
 }
 
 function _lom_add_order_note_and_save( $order, $note ) {
@@ -70,10 +70,29 @@ function _lom_handle_wp_error( $order, $wp_error, $action ) {
 	return false;
 }
 
+/**
+ * Process a successful refund.
+ *
+ * @param WC_Order $order  WooCommerce order object.
+ * @param float    $amount Refunded amount.
+ * @return bool
+ */
 function _lom_process_successful_refund( $order, $amount ) {
+	$refunds        = $order->get_refunds();
+	$total_refunded = 0.0;
+	foreach ( $refunds as $refund ) {
+		$total_refunded += floatval( $refund->get_amount() );
+	}
+
+	$is_fully_refunded = $total_refunded >= floatval( $order->get_total() );
+	if ( $is_fully_refunded ) {
+		$order->update_meta_data( '_wc_ledyer_capture_id', false );
+		$order->save();
+	}
+
 	$formatted_amount = wc_price( $amount, array( 'currency' => $order->get_meta( '_order_currency', true ) ) );
-	_lom_add_order_note_and_save( $order, $formatted_amount . ' refunded via Ledyer.' );
-	$order->update_meta_data( '_wc_ledyer_capture_id', false );
-	$order->save();
+	// translators: %s: formatted refunded amount.
+	_lom_add_order_note_and_save( $order, sprintf( __( '%s refunded via Ledyer.', 'ledyer-order-management-for-woocommerce' ), $formatted_amount ) );
+
 	return true;
 }
