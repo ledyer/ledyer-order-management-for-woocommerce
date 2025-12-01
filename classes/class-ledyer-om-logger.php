@@ -69,26 +69,16 @@ class Logger {
 	 * @return array
 	 */
 	public static function format_log( $ledyer_order_id, $method, $title, $request_args, $response, $code ) {
-		// Unset the snippet to prevent issues in the response.
-		if ( isset( $response['snippet'] ) ) {
-			unset( $response['snippet'] );
-		}
-		// Unset the snippet to prevent issues in the request body.
-		if ( isset( $request_args['body'] ) ) {
-			$request_body = json_decode( $request_args['body'], true );
-		}
-
 		return array(
 			'id'             => $ledyer_order_id,
 			'type'           => $method,
 			'title'          => $title,
 			'request'        => $request_args,
 			'response'       => array(
-				'body' => $request_body ?? $response,
+				'body' => $response,
 				'code' => $code,
 			),
 			'timestamp'      => gmdate( 'Y-m-d H:i:s' ),
-			// phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 			'stack'          => self::get_stack(),
 			'plugin_version' => Ledyer_Order_Management_For_WooCommerce::VERSION,
 		);
