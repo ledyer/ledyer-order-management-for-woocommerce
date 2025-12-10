@@ -3,15 +3,18 @@ Contributors: ledyer
 Tags: woocommerce, ledyer, ecommerce, e-commerce, order-management
 Donate link: https://ledyer.com
 Requires at least: 4.0
-Tested up to: 6.8.3
+Tested up to: 6.9.0
 Requires PHP: 7.4
 WC requires at least: 5.0.0
-WC tested up to: 10.3.5
-Stable tag: 1.5.6
+WC tested up to: 10.3.6
+Stable tag: 1.5.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Changelog ==
+= 2025.12.10    - version 1.5.7 =
+* Fix           - Resolved an error that could occur with partially refunded orders when attempting to refund the remaining amount in full.
+
 = 2025.11.24    - version 1.5.6 =
 * Enhancement   - Ensure an order can be captured before attempting a capture when the WooCommerce order is set to completed.
 
