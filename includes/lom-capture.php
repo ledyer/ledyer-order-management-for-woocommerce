@@ -5,8 +5,8 @@
 /**
  * Captures a Ledyer order.
  *
- * @param int  $order_id Order ID.
- * @param bool $action If this was triggered by an action.
+ * @param int                      $order_id Order ID.
+ * @param bool                     $action If this was triggered by an action.
  * @param $api The lom api instance
  */
 function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
@@ -85,12 +85,13 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 
 	// Check if the order is ready for capture or not. If its not, then either update the order status or print a notice and return.
 	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) && ! lom_ledyer_order_can_be_captured( $ledyer_order ) ) {
-		$errmsg = __( 'Ledyer order is not ready for capture.', 'ledyer-order-management-for-woocommerce');
+		$errmsg = __( 'Ledyer order is not ready for capture.', 'ledyer-order-management-for-woocommerce' );
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
 			$order->add_order_note( $errmsg );
 		}
+		$order->update_meta_data( '_ledyer_waiting_on_ready_for_capture', true );
 		$order->save();
 		return;
 	}
@@ -133,7 +134,7 @@ function lom_ledyer_order_can_be_captured( $ledyer_order ) {
 
 	// If the capture type exists in the 'availableActions', then the order can still be captured.
 	$can_be_captured = false;
-	foreach( $uncaptured_data['availableActions'] as $action ) {
+	foreach ( $uncaptured_data['availableActions'] as $action ) {
 		if ( $action['type'] === 'capture' ) {
 			$can_be_captured = true;
 			break;
