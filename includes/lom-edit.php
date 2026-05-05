@@ -66,7 +66,7 @@ function lom_allow_editing( $order ) {
 }
 
 function lom_is_order_editable( $ledyer_order ) {
-	return count( $ledyer_order['status'] ) == 1 && in_array( LedyerOmOrderStatus::uncaptured, $ledyer_order['status'] );
+	return in_array( LedyerOmOrderStatus::uncaptured, $ledyer_order['status'] );
 }
 
 function lom_process_order_sync( $order, $api, $ledyer_order_id ) {
