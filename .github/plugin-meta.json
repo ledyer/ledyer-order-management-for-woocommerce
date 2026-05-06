@@ -1,0 +1,16 @@
+{
+  "pluginDevZipE2e": {
+    "pages": [
+      {
+        "url": "/wp-admin/admin.php?page=lom-settings",
+        "assertions": [
+          {
+            "selector": "body",
+            "text": "Ledyer Order Management",
+            "match": "contains"
+          }
+        ]
+      }
+    ]
+  }
+}
