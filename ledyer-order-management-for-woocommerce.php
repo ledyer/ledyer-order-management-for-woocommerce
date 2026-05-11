@@ -5,12 +5,12 @@
  * Description: Ledyer Order Management for WooCommerce.
  * Author: Ledyer AB
  * Author URI: https://www.ledyer.com
- * Version: 1.5.8
+ * Version: 1.5.9
  * Text Domain: ledyer-order-management-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 4.0.0
- * WC tested up to: 10.5.2
+ * WC tested up to: 10.7.0
  *
  * Copyright (c) 2017-2026 Ledyer
  *
