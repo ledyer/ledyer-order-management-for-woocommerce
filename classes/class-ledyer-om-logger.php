@@ -73,9 +73,9 @@ class Logger {
 		if ( isset( $response['snippet'] ) ) {
 			unset( $response['snippet'] );
 		}
-		// Unset the snippet to prevent issues in the request body.
+		// Decode the request body so it is not logged as an escaped JSON string.
 		if ( isset( $request_args['body'] ) ) {
-			$request_body = json_decode( $request_args['body'], true );
+			$request_args['body'] = json_decode( $request_args['body'], true );
 		}
 
 		return array(
@@ -84,7 +84,7 @@ class Logger {
 			'title'          => $title,
 			'request'        => $request_args,
 			'response'       => array(
-				'body' => $request_body ?? $response,
+				'body' => $response,
 				'code' => $code,
 			),
 			'timestamp'      => gmdate( 'Y-m-d H:i:s' ),
