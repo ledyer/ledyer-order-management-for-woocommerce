@@ -3,6 +3,67 @@
 \defined( 'ABSPATH' ) || die();
 
 /**
+ * Captures a Ledyer order for a trusted WordPress integration.
+ *
+ * @param int $order_id WooCommerce order ID.
+ * @return array|WP_Error Capture result or error.
+ */
+function ledyer_om_capture_order( $order_id ) {
+	$order = wc_get_order( $order_id );
+	if ( ! $order || ! lom_order_placed_with_ledyer( $order->get_payment_method() ) ) {
+		return new WP_Error( 'ledyer_invalid_order', 'The order is not a Ledyer order.' );
+	}
+
+	$ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true );
+	if ( ! $ledyer_order_id ) {
+		return new WP_Error( 'ledyer_order_id_missing', 'The Ledyer order ID is missing.' );
+	}
+
+	$api            = ledyerOm()->api;
+	$payment_status = $api->get_payment_status( $ledyer_order_id );
+	if ( is_wp_error( $payment_status ) ) {
+		return $payment_status;
+	}
+
+	$status = $payment_status['status'] ?? LedyerOmPaymentStatus::unknown;
+	if ( LedyerOmPaymentStatus::orderCaptured === $status ) {
+		return array(
+			'result'         => 'already_captured',
+			'payment_status' => $payment_status,
+		);
+	}
+
+	if ( LedyerOmPaymentStatus::paymentConfirmed !== $status ) {
+		$message = sprintf( 'The Ledyer order cannot be captured because its payment status is "%s".', $status );
+		if ( ! empty( $payment_status['note'] ) ) {
+			$message .= ' ' . $payment_status['note'];
+		}
+		return new WP_Error( 'ledyer_capture_unavailable', $message, $payment_status );
+	}
+
+	$order_mapper = new \LedyerOm\OrderMapper( $order );
+	$response     = $api->capture_order( $ledyer_order_id, $order_mapper->woo_to_ledyer_capture_order_lines() );
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$capture_id = $response['captured'][0]['ledgerId'] ?? '';
+	if ( ! $capture_id ) {
+		return new WP_Error( 'ledyer_invalid_capture_response', 'Ledyer returned no capture ID.', $response );
+	}
+
+	$order->add_order_note( 'Ledyer order captured. Capture ID: ' . $capture_id );
+	$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
+	$order->save();
+
+	return array(
+		'result'       => 'captured',
+		'capture_id'   => $capture_id,
+		'ledyer_order' => $response,
+	);
+}
+
+/**
  * Captures a Ledyer order.
  *
  * @param int                      $order_id Order ID.

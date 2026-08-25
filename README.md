@@ -34,3 +34,19 @@ wordpress-cli:
 ## Debugging
 
 In VS code, install xdebug and optionally a PHP intellisense extension. Then just click Run and debug
+
+## Capture API for WordPress integrations
+
+Trusted server-side plugins can request a full capture using the WooCommerce order ID:
+
+```php
+$result = ledyer_om_capture_order( $order_id );
+
+if ( is_wp_error( $result ) ) {
+	// Handle $result->get_error_message().
+} else {
+	// $result['result'] is "captured" or "already_captured".
+}
+```
+
+The function bypasses the automatic capture setting and local WooCommerce paid/ready state. It captures only when Ledyer reports `paymentConfirmed`; other statuses return `WP_Error`. Call it after `plugins_loaded` and guard with `function_exists( 'ledyer_om_capture_order' )`.
