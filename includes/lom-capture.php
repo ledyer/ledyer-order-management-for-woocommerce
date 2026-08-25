@@ -41,26 +41,7 @@ function ledyer_om_capture_order( $order_id ) {
 		return new WP_Error( 'ledyer_capture_unavailable', $message, $payment_status );
 	}
 
-	$order_mapper = new \LedyerOm\OrderMapper( $order );
-	$response     = $api->capture_order( $ledyer_order_id, $order_mapper->woo_to_ledyer_capture_order_lines() );
-	if ( is_wp_error( $response ) ) {
-		return $response;
-	}
-
-	$capture_id = $response['captured'][0]['ledgerId'] ?? '';
-	if ( ! $capture_id ) {
-		return new WP_Error( 'ledyer_invalid_capture_response', 'Ledyer returned no capture ID.', $response );
-	}
-
-	$order->add_order_note( 'Ledyer order captured. Capture ID: ' . $capture_id );
-	$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
-	$order->save();
-
-	return array(
-		'result'       => 'captured',
-		'capture_id'   => $capture_id,
-		'ledyer_order' => $response,
-	);
+	return lom_attempt_ledyer_order_capture( $order, $ledyer_order_id, $api );
 }
 
 /**
@@ -157,17 +138,9 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
-	$orderMapper = new \LedyerOm\OrderMapper( $order );
-	$data        = $orderMapper->woo_to_ledyer_capture_order_lines();
-	$response    = $api->capture_order( $ledyer_order_id, $data );
+	$response = lom_attempt_ledyer_order_capture( $order, $ledyer_order_id, $api );
 
 	if ( ! is_wp_error( $response ) ) {
-		$first_captured = lom_get_first_captured( $response );
-		$capture_id     = $first_captured['ledgerId'];
-
-		$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
-		$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
-		$order->save();
 		return;
 	}
 
@@ -178,6 +151,39 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		$order->add_order_note( $errmsg );
 	}
 	$order->save();
+}
+
+/**
+ * Performs a full Ledyer capture and saves its capture ID.
+ *
+ * @param WC_Order $order WooCommerce order.
+ * @param string   $ledyer_order_id Ledyer order ID.
+ * @param object   $api Ledyer Order Management API instance.
+ * @return array|WP_Error Capture result or error.
+ */
+function lom_attempt_ledyer_order_capture( $order, $ledyer_order_id, $api ) {
+	$order_mapper = new \LedyerOm\OrderMapper( $order );
+	$data         = $order_mapper->woo_to_ledyer_capture_order_lines();
+	$response     = $api->capture_order( $ledyer_order_id, $data );
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$capture_id = $response['captured'][0]['ledgerId'] ?? '';
+	if ( ! $capture_id ) {
+		return new WP_Error( 'ledyer_invalid_capture_response', 'Ledyer returned no capture ID.', $response );
+	}
+
+	$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
+	$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
+	$order->save();
+
+	return array(
+		'result'       => 'captured',
+		'capture_id'   => $capture_id,
+		'ledyer_order' => $response,
+	);
 }
 
 /**
