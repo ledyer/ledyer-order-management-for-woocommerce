@@ -27,14 +27,17 @@ function ledyer_om_capture_order( $order_id ) {
 
 	$status = $payment_status['status'] ?? LedyerOmPaymentStatus::unknown;
 	if ( LedyerOmPaymentStatus::orderCaptured === $status ) {
-		$ledyer_order = $api->get_order( $ledyer_order_id );
-		if ( ! is_wp_error( $ledyer_order ) && in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'] ?? array(), true ) ) {
-			$first_captured = lom_get_first_captured( $ledyer_order );
-			$capture_id     = $first_captured['ledgerId'] ?? '';
-			if ( $capture_id ) {
-				$order->add_order_note( 'Ledyer order has already been captured.' );
-				$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
-				$order->save();
+		// An integration may poll this function, and we shouldn't add a note on every call.
+		if ( ! $order->get_meta( '_wc_ledyer_capture_id', true ) ) {
+			$ledyer_order = $api->get_order( $ledyer_order_id );
+			if ( ! is_wp_error( $ledyer_order ) && in_array( LedyerOmOrderStatus::fullyCaptured, $ledyer_order['status'] ?? array(), true ) ) {
+				$first_captured = lom_get_first_captured( $ledyer_order );
+				$capture_id     = $first_captured['ledgerId'] ?? '';
+				if ( $capture_id ) {
+					$order->add_order_note( 'Ledyer order has already been captured.' );
+					$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
+					$order->save();
+				}
 			}
 		}
 
