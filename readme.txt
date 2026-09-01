@@ -3,15 +3,18 @@ Contributors: ledyer
 Tags: woocommerce, ledyer, ecommerce, e-commerce, order-management
 Donate link: https://ledyer.com
 Requires at least: 4.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 5.0.0
-WC tested up to: 10.7.0
-Stable tag: 1.5.9
+WC tested up to: 11.0.1
+Stable tag: 1.5.10
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Changelog ==
+= 2026.09.01    - version 1.5.10 =
+* Enhancement   - Added support for other plugins to trigger a Ledyer order capture directly.
+
 = 2026.05.11    - version 1.5.9 =
 * Fix           - Fixed an issue where orders were sometimes incorrectly handled as already captured by the plugin.
 
