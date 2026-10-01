@@ -14,19 +14,25 @@ function ledyer_om_capture_order( $order_id ) {
 		return new WP_Error( 'ledyer_invalid_order', 'The order is not a Ledyer order.' );
 	}
 
+	\LedyerOm\Logger::start_order_context( 'capture', $order );
+	\LedyerOm\Logger::info( 'Capture requested by integration' );
+
 	$ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true );
 	if ( ! $ledyer_order_id ) {
+		\LedyerOm\Logger::error( 'Capture failed: the Ledyer order ID is missing on the order' );
 		return new WP_Error( 'ledyer_order_id_missing', 'The Ledyer order ID is missing.' );
 	}
 
 	$api            = ledyerOm()->api;
 	$payment_status = $api->get_payment_status( $ledyer_order_id );
 	if ( is_wp_error( $payment_status ) ) {
+		\LedyerOm\Logger::error( 'Capture failed: could not get the payment status from Ledyer', array( 'error' => $payment_status->get_error_message() ) );
 		return $payment_status;
 	}
 
 	$status = $payment_status['status'] ?? LedyerOmPaymentStatus::unknown;
 	if ( LedyerOmPaymentStatus::orderCaptured === $status ) {
+		\LedyerOm\Logger::info( 'Order is already captured in Ledyer' );
 		// An integration may poll this function, and we shouldn't add a note on every call.
 		if ( ! $order->get_meta( '_wc_ledyer_capture_id', true ) ) {
 			$ledyer_order = $api->get_order( $ledyer_order_id );
@@ -52,6 +58,7 @@ function ledyer_om_capture_order( $order_id ) {
 		if ( ! empty( $payment_status['note'] ) ) {
 			$message .= ' ' . $payment_status['note'];
 		}
+		\LedyerOm\Logger::warning( 'Order can not be captured with its current payment status', array( 'ledyer_status' => $status ) );
 		return new WP_Error( 'ledyer_capture_unavailable', $message, $payment_status );
 	}
 
@@ -88,8 +95,12 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
+	\LedyerOm\Logger::start_order_context( 'capture', $order );
+	\LedyerOm\Logger::info( 'Order completed, capturing the Ledyer order' );
+
 	// Do nothing if Ledyer order was already captured according to the woo-order
 	if ( $order->get_meta( '_wc_ledyer_capture_id', true ) ) {
+		\LedyerOm\Logger::info( 'Capture skipped: the order already has a capture ID', array( 'capture_id' => $order->get_meta( '_wc_ledyer_capture_id', true ) ) );
 		$order->add_order_note( 'Ledyer order has already been captured.' );
 		$order->save();
 		return;
@@ -100,6 +111,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 	// Do nothing if we don't have Ledyer order ID.
 	if ( $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
 		$errmsg = 'Ledyer order ID is missing, Ledyer order could not be captured at this time.';
+		\LedyerOm\Logger::error( 'Capture failed: the Ledyer order ID or transaction ID is missing on the order' );
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
@@ -114,6 +126,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 
 	if ( is_wp_error( $ledyer_order ) ) {
 		$errmsg = 'Ledyer order could not be captured due to an error: ' . $ledyer_order->get_error_message();
+		\LedyerOm\Logger::error( 'Capture failed: could not get the order from Ledyer', array( 'error' => $ledyer_order->get_error_message() ) );
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
@@ -129,11 +142,19 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 		$formatted_capture_at = date( 'Y-m-d H:i:s', strtotime( $captured_at ) );
 		$capture_id           = $first_captured['ledgerId'];
 
+		\LedyerOm\Logger::info(
+			'Capture skipped: the order is already captured in Ledyer',
+			array(
+				'capture_id'  => $capture_id,
+				'captured_at' => $captured_at,
+			)
+		);
 		$order->add_order_note( 'Ledyer order has already been captured on ' . $formatted_capture_at );
 		$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
 		$order->save();
 		return;
 	} elseif ( in_array( LedyerOmOrderStatus::cancelled, $ledyer_order['status'], true ) ) {
+		\LedyerOm\Logger::warning( 'Capture skipped: the order is cancelled in Ledyer' );
 		$order->add_order_note( 'Ledyer order failed to capture, the order has already been cancelled' );
 		$order->save();
 		return;
@@ -142,6 +163,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 	// Check if the order is ready for capture or not. If its not, then either update the order status or print a notice and return.
 	if ( ! $order->get_meta( '_ledyer_ready_for_capture', true ) && ! lom_ledyer_order_can_be_captured( $ledyer_order ) ) {
 		$errmsg = __( 'Ledyer order is not ready for capture.', 'ledyer-order-management-for-woocommerce' );
+		\LedyerOm\Logger::warning( 'Capture postponed: the order is not ready for capture, waiting for the ready_for_capture event', array( 'ledyer_status' => $ledyer_order['status'] ) );
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {
@@ -159,6 +181,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 	}
 
 	$errmsg = 'Ledyer order could not be captured due to an error: ' . $response->get_error_message();
+	\LedyerOm\Logger::error( 'Capture failed', array( 'error' => $response->get_error_message() ) );
 	if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 		$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 	} else {
@@ -186,12 +209,21 @@ function lom_attempt_ledyer_order_capture( $order, $ledyer_order_id, $api ) {
 
 	$capture_id = $response['captured'][0]['ledgerId'] ?? '';
 	if ( ! $capture_id ) {
+		\LedyerOm\Logger::error( 'Capture failed: Ledyer returned no capture ID' );
 		return new WP_Error( 'ledyer_invalid_capture_response', 'Ledyer returned no capture ID.', $response );
 	}
 
 	$order->add_order_note( 'Ledyer order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $capture_id );
 	$order->update_meta_data( '_wc_ledyer_capture_id', $capture_id );
 	$order->save();
+
+	\LedyerOm\Logger::info(
+		'Order captured in Ledyer',
+		array(
+			'capture_id' => $capture_id,
+			'amount'     => $order->get_total(),
+		)
+	);
 
 	return array(
 		'result'       => 'captured',
