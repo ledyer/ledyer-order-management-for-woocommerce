@@ -111,7 +111,7 @@ function lom_capture_ledyer_order( $order_id, $api, $action = false ) {
 	// Do nothing if we don't have Ledyer order ID.
 	if ( $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
 		$errmsg = 'Ledyer order ID is missing, Ledyer order could not be captured at this time.';
-		\LedyerOm\Logger::error( 'Capture failed: the Ledyer order ID or transaction ID is missing on the order' );
+		\LedyerOm\Logger::error( 'Capture failed: the order has a Ledyer order ID but no transaction ID' );
 		if ( 'none' !== $lom_status_mapping_ledyer_error ) {
 			$order->update_status( $lom_status_mapping_ledyer_error, $errmsg );
 		} else {

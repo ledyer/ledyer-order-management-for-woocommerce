@@ -280,8 +280,15 @@ abstract class Request {
 	 * @return void
 	 */
 	private function maybe_add_order_log_context() {
+		if ( ! $this->order ) {
+			return;
+		}
+
 		$context = Logger::get_context();
-		if ( $this->order && empty( $context['wc_order_id'] ) ) {
+		if ( empty( $context['wc_order_id'] ) ) {
+			Logger::add_order_context( $this->order );
+		} elseif ( (string) $this->order->get_id() !== $context['wc_order_id'] ) {
+			Logger::clear_context();
 			Logger::add_order_context( $this->order );
 		}
 	}

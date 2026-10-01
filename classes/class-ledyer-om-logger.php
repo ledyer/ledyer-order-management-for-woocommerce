@@ -21,6 +21,11 @@ class Logger {
 	const LOG_SOURCE = 'ledyer-log';
 
 	/**
+	 * The maximum length of a non-JSON response body to log.
+	 */
+	const MAX_RAW_BODY_LENGTH = 2000;
+
+	/**
 	 * Readable labels for the log context actions.
 	 *
 	 * @var array
@@ -281,8 +286,18 @@ class Logger {
 	 * @return void
 	 */
 	public static function log_request( $title, $method, $url, $request_args, $response, $duration, $is_logging_enabled = null, $extra = array() ) {
-		$code = wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( ! self::is_logging_enabled( $is_logging_enabled ) ) {
+			return;
+		}
+
+		$code     = wp_remote_retrieve_response_code( $response );
+		$raw_body = wp_remote_retrieve_body( $response );
+		$body     = json_decode( $raw_body, true );
+
+		// Keep non-JSON responses (e.g. an HTML error page from a proxy) readable, but bounded in size.
+		if ( null === $body && '' !== $raw_body ) {
+			$body = strlen( $raw_body ) > self::MAX_RAW_BODY_LENGTH ? substr( $raw_body, 0, self::MAX_RAW_BODY_LENGTH ) . '... [truncated]' : $raw_body;
+		}
 
 		$log = self::format_log( '', $method, $title, $request_args, $body, $code );
 		unset( $log['id'], $log['type'], $log['title'] );
