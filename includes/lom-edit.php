@@ -22,9 +22,13 @@ function lom_edit_ledyer_order( $order_id, $api, $syncType, $action = false ) {
 		return;
 	}
 
+	\LedyerOm\Logger::start_order_context( 'customer' === $syncType ? 'edit-customer' : 'edit-order', $order );
+	\LedyerOm\Logger::info( 'Order updated in WooCommerce, syncing it to Ledyer' );
+
 	$ledyer_order_id = $order->get_meta( '_wc_ledyer_order_id', true );
 
 	if ( ! $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
+		\LedyerOm\Logger::error( 'Sync failed: the Ledyer order ID is missing on the order' );
 		$order->add_order_note( 'Ledyer order ID is missing, Ledyer order could not be updated at this time.' );
 		$order->save();
 		return;
@@ -34,12 +38,14 @@ function lom_edit_ledyer_order( $order_id, $api, $syncType, $action = false ) {
 
 	if ( is_wp_error( $ledyer_order ) ) {
 		$errmsg = 'Ledyer order could not be updated due to an error: ' . $ledyer_order->get_error_message();
+		\LedyerOm\Logger::error( 'Sync failed: could not get the order from Ledyer', array( 'error' => $ledyer_order->get_error_message() ) );
 		$order->add_order_note( $errmsg );
 		$order->save();
 		return;
 	}
 
 	if ( ! lom_is_order_editable( $ledyer_order ) ) {
+		\LedyerOm\Logger::warning( 'Sync not possible: the order is captured or cancelled in Ledyer', array( 'ledyer_status' => $ledyer_order['status'] ?? array() ) );
 		$order->add_order_note( 'Ledyer order has been captured or cancelled, Ledyer order could not be updated at this time.' );
 		$order->save();
 		return;
@@ -85,8 +91,12 @@ function lom_process_customer_sync( $order, $api, $ledyer_order_id ) {
 
 function lom_handle_sync_response( $order, $response ) {
 	if ( is_wp_error( $response ) ) {
+		\LedyerOm\Logger::error( 'Sync failed', array( 'error' => $response->get_error_message() ) );
 		$errmsg = 'Sync could not be completed due to an error: ' . $response->get_error_message();
 		$order->add_order_note( $errmsg );
 		$order->save();
+		return;
 	}
+
+	\LedyerOm\Logger::info( 'Order synced to Ledyer' );
 }

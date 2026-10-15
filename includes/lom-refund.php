@@ -16,6 +16,9 @@ function lom_refund_ledyer_order( $order_id, $amount, $api ) {
 		return false; // Not a Ledyer order
 	}
 
+	\LedyerOm\Logger::start_order_context( 'refund', $order );
+	\LedyerOm\Logger::info( 'Refund requested', array( 'amount' => $amount ) );
+
 	if ( ! _lom_can_order_be_refunded( $order, $api ) ) {
 		return false; // Order cannot be refunded
 	}
@@ -26,12 +29,19 @@ function lom_refund_ledyer_order( $order_id, $amount, $api ) {
 
 function _lom_can_order_be_refunded( $order, $api ) {
 	if ( ! _lom_is_order_captured( $order ) ) {
+		\LedyerOm\Logger::warning( 'Refund not possible: the order has no capture ID (not captured, or captured outside WooCommerce)' );
 		_lom_add_order_note_and_save( $order, 'Ledyer order not captured/captured outside WooCommerce, cannot be refunded.' );
 		return false;
 	}
 
 	$ledyer_payment_status_response = $api->get_payment_status( $order->get_meta( '_wc_ledyer_order_id', true ) );
 	if ( is_wp_error( $ledyer_payment_status_response ) || $ledyer_payment_status_response['status'] !== LedyerOmPaymentStatus::orderCaptured ) {
+		\LedyerOm\Logger::warning(
+			'Refund not possible: the order is not fully captured in Ledyer',
+			is_wp_error( $ledyer_payment_status_response )
+				? array( 'error' => $ledyer_payment_status_response->get_error_message() )
+				: array( 'ledyer_status' => $ledyer_payment_status_response['status'] ?? '' )
+		);
 		_lom_add_order_note_and_save( $order, 'Ledyer order not fully captured, cannot be refunded.' );
 		return false;
 	}
@@ -65,6 +75,7 @@ function _lom_add_order_note_and_save( $order, $note ) {
 }
 
 function _lom_handle_wp_error( $order, $wp_error, $action ) {
+	\LedyerOm\Logger::error( 'Refund failed', array( 'error' => $wp_error->get_error_message() ) );
 	$errmsg = 'Ledyer order could not be ' . $action . ' due to an error: ' . $wp_error->get_error_message();
 	_lom_add_order_note_and_save( $order, $errmsg );
 	return false;
@@ -91,6 +102,15 @@ function _lom_process_successful_refund( $order, $amount ) {
 	}
 
 	$formatted_amount = wc_price( $amount, array( 'currency' => $order->get_meta( '_order_currency', true ) ) );
+	\LedyerOm\Logger::info(
+		'Order refunded in Ledyer',
+		array(
+			'amount'         => $amount,
+			'total_refunded' => $total_refunded,
+			'fully_refunded' => $is_fully_refunded,
+		)
+	);
+
 	// translators: %s: formatted refunded amount.
 	_lom_add_order_note_and_save( $order, sprintf( __( '%s refunded via Ledyer.', 'ledyer-order-management-for-woocommerce' ), $formatted_amount ) );
 

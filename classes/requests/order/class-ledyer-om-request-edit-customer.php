@@ -20,6 +20,13 @@ class Edit_Customer extends Request_Order {
 	 * Request method
 	 */
 	protected $method = 'POST';
+
+	/**
+	 * The log title to use for the debug log.
+	 *
+	 * @var string
+	 */
+	protected $log_title = 'Edit customer';
 	/*
 	 * Set entrypoint
 	 */

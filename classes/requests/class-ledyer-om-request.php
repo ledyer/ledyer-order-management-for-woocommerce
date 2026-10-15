@@ -55,6 +55,12 @@ abstract class Request {
 	 */
 	protected $request_url;
 
+	/**
+	 * The log title to use for the debug log.
+	 *
+	 * @var string
+	 */
+	protected $log_title = 'Request';
 
 	/**
 	 * The WC order.
@@ -132,6 +138,7 @@ abstract class Request {
 		}
 
 		$client             = new \WP_Http();
+		$start              = microtime( true );
 		$client_credentials = $this->gateway_settings->get_client_credentials();
 
 		$headers = array(
@@ -145,6 +152,13 @@ abstract class Request {
 				'timeout' => 60,
 			)
 		);
+
+		$this->maybe_add_order_log_context();
+		$token_args = array(
+			'headers' => $headers,
+			'method'  => 'POST',
+		);
+		Logger::log_request( 'Get access token', 'POST', $api_auth_base . 'oauth/token', $token_args, $response, microtime( true ) - $start, $this->gateway_settings->is_logging_enabled() );
 
 		$body = $this->process_response( $response, array( 'grant_type' => 'client_credentials' ), $api_auth_base . 'oauth/token' );
 
@@ -174,10 +188,27 @@ abstract class Request {
 		return $this->do_request( $url, $args );
 	}
 
-	/** internal retry helper with exponential backoff */
+	/**
+	 * Internal retry helper with exponential backoff.
+	 *
+	 * @param string $url         The request URL.
+	 * @param array  $args        The request args.
+	 * @param int    $max_retries The number of retries left.
+	 * @param float  $delay       The delay before the next retry, in seconds.
+	 * @param int    $exp         The backoff exponent.
+	 *
+	 * @return mixed|\WP_Error
+	 */
 	protected function do_request( $url, $args, $max_retries = 4, $delay = 0.5, $exp = 2 ) {
+		$start    = microtime( true );
 		$response = wp_remote_request( $url, $args );
-		$parsed   = $this->process_response( $response, $args, $url );
+
+		$this->maybe_add_order_log_context();
+		// The first attempt has all 4 retries left.
+		$extra = $max_retries < 4 ? array( 'retry_attempt' => 4 - $max_retries ) : array();
+		Logger::log_request( $this->log_title, $this->method, $url, $args, $response, microtime( true ) - $start, $this->gateway_settings->is_logging_enabled(), $extra );
+
+		$parsed = $this->process_response( $response, $args, $url );
 		if ( is_wp_error( $parsed ) ) {
 			$http_response_code = wp_remote_retrieve_response_code( $response );
 			// retry connection, timeout errors etc + all http 500 and above.
@@ -244,8 +275,26 @@ abstract class Request {
 	}
 
 	/**
+	 * Adds the order's trace IDs to the log context when the request is made outside of an order management action.
+	 *
+	 * @return void
+	 */
+	private function maybe_add_order_log_context() {
+		if ( ! $this->order ) {
+			return;
+		}
+
+		$context = Logger::get_context();
+		if ( empty( $context['wc_order_id'] ) ) {
+			Logger::add_order_context( $this->order );
+		} elseif ( (string) $this->order->get_id() !== $context['wc_order_id'] ) {
+			Logger::clear_context();
+			Logger::add_order_context( $this->order );
+		}
+	}
+
+	/**
 	 * Process response. Return response body or error.
-	 * Log errors.
 	 *
 	 * @param $response
 	 * @param $request_args
@@ -254,12 +303,6 @@ abstract class Request {
 	 * @return mixed|\WP_Error
 	 */
 	protected function process_response( $response, $request_args, $request_url ) {
-		$code = wp_remote_retrieve_response_code( $response );
-
-		$log = Logger::format_log( '', 'POST', 'Debugger', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
-
-		Logger::log( $log, $this->gateway_settings->is_logging_enabled() );
-
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -276,7 +319,7 @@ abstract class Request {
 					$error_message .= ' ' . $error['message'];
 				}
 			}
-			$return = new \WP_Error( $response_code, $error_message, $data );
+			$return = new \WP_Error( $response_code, trim( $error_message ), $data );
 		} else {
 			$return = json_decode( wp_remote_retrieve_body( $response ), true );
 		}

@@ -25,8 +25,12 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 		return;
 	}
 
+	\LedyerOm\Logger::start_order_context( 'cancel', $order );
+	\LedyerOm\Logger::info( 'Order cancelled, cancelling the Ledyer order' );
+
 	// Do nothing if Ledyer order has already been cancelled
 	if ( $order->get_meta( '_wc_ledyer_cancelled', true ) ) {
+		\LedyerOm\Logger::info( 'Cancel skipped: the order is already marked as cancelled in Ledyer' );
 		$order->add_order_note( 'Ledyer order has already been cancelled.' );
 		$order->save();
 		return;
@@ -37,6 +41,7 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 	// Do nothing if we don't have Ledyer order ID.
 	if ( ! $ledyer_order_id && empty( $order->get_transaction_id() ) ) {
 		$errmsg = 'Ledyer order ID is missing, Ledyer order could not be cancelled at this time.';
+		\LedyerOm\Logger::error( 'Cancel failed: the Ledyer order ID is missing on the order' );
 		$order->add_order_note( $errmsg );
 		$order->save();
 		return;
@@ -47,16 +52,19 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 
 	if ( is_wp_error( $ledyer_order ) ) {
 		$errmsg = 'Ledyer order could not be cancelled due to an error: ' . $ledyer_order->get_error_message();
+		\LedyerOm\Logger::error( 'Cancel failed: could not get the order from Ledyer', array( 'error' => $ledyer_order->get_error_message() ) );
 		$order->add_order_note( $errmsg );
 		$order->save();
 		return;
 	}
 
 	if ( $ledyer_order['uncaptured'] == null ) {
+		\LedyerOm\Logger::warning( 'Cancel not possible: the order is already captured in Ledyer' );
 		$order->add_order_note( 'Ledyer order can not be cancelled because it has already been captured' );
 		$order->save();
 		return;
 	} elseif ( in_array( LedyerOmOrderStatus::cancelled, $ledyer_order['status'] ) ) {
+		\LedyerOm\Logger::info( 'Cancel skipped: the order is already cancelled in Ledyer' );
 		$order->add_order_note( 'Ledyer order has already been cancelled' );
 		$order->save();
 		return;
@@ -65,6 +73,7 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 	$response = $api->cancel_order( $ledyer_order_id );
 
 	if ( ! is_wp_error( $response ) ) {
+		\LedyerOm\Logger::info( 'Order cancelled in Ledyer' );
 		$order->add_order_note( 'Ledyer order cancelled.' );
 		$order->update_meta_data( '_wc_ledyer_cancelled', 'yes' );
 		$order->save();
@@ -72,6 +81,7 @@ function lom_cancel_ledyer_order( $order_id, $api, $action = false ) {
 	}
 
 	$errmsg = 'Ledyer order could not be cancelled due to an error: ' . $response->get_error_message();
+	\LedyerOm\Logger::error( 'Cancel failed', array( 'error' => $response->get_error_message() ) );
 	$order->add_order_note( $errmsg );
 	$order->save();
 }

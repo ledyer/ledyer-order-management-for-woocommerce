@@ -20,6 +20,13 @@ class Capture_Order extends Request_Order {
 	 * Request method
 	 */
 	protected $method = 'POST';
+
+	/**
+	 * The log title to use for the debug log.
+	 *
+	 * @var string
+	 */
+	protected $log_title = 'Capture order';
 	/*
 	 * Set entrypoint
 	 */
