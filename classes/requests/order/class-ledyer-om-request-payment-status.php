@@ -20,6 +20,13 @@ class Payment_Status extends Request_Order {
 	 * Request method
 	 */
 	protected $method = 'GET';
+
+	/**
+	 * The log title to use for the debug log.
+	 *
+	 * @var string
+	 */
+	protected $log_title = 'Get payment status';
 	/*
 	 * Set entrypoint
 	 */

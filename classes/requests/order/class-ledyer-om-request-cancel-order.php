@@ -20,6 +20,13 @@ class Cancel_Order extends Request_Order {
 	 * Request method
 	 */
 	protected $method = 'DELETE';
+
+	/**
+	 * The log title to use for the debug log.
+	 *
+	 * @var string
+	 */
+	protected $log_title = 'Cancel order';
 	/*
 	 * Set entrypoint
 	 */
