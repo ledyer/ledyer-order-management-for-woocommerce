@@ -7,11 +7,15 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 5.0.0
 WC tested up to: 11.0.1
-Stable tag: 1.5.10
+Stable tag: 1.5.11
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Changelog ==
+= 2026.11.10    - version 1.5.11 =
+* Enhancement   - Improved logging with log levels, the related Ledyer and WooCommerce order IDs on each entry, and more events logged throughout the order management flow.
+* Enhancement   - Requests to Ledyer now include a User-Agent header with the WordPress, WooCommerce, plugin and PHP versions. The value can be changed with the new ledyer_om_request_user_agent filter.
+
 = 2026.09.01    - version 1.5.10 =
 * Enhancement   - Added support for other plugins to trigger a Ledyer order capture directly.
 
